@@ -12,3 +12,18 @@ router.get('/', verifyToken, (req, res) => {
 });
 
 module.exports = router;
+const express = require("express");
+const router = express.Router();
+const taskController = require("../controllers/task.controller");
+const { verifyToken } = require("../middlewares/auth.middleware");
+const { validateTask } = require("../middlewares/validation.middleware");
+
+// Rotas de tarefas
+router.post("/", verifyToken, validateTask, taskController.create);
+router.get("/", verifyToken, taskController.findAll);
+router.get("/:id", verifyToken, taskController.findOne);
+router.put("/:id", verifyToken, validateTask, taskController.update);
+router.put("/:id/status", verifyToken, taskController.updateStatus);
+router.delete("/:id", verifyToken, taskController.delete);
+
+module.exports = router;

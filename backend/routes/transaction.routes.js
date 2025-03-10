@@ -12,3 +12,18 @@ router.get('/', verifyToken, (req, res) => {
 });
 
 module.exports = router;
+const express = require("express");
+const router = express.Router();
+const transactionController = require("../controllers/transaction.controller");
+const { verifyToken } = require("../middlewares/auth.middleware");
+const { validateTransaction } = require("../middlewares/validation.middleware");
+
+// Rotas de transações
+router.post("/", verifyToken, validateTransaction, transactionController.create);
+router.get("/", verifyToken, transactionController.findAll);
+router.get("/summary", verifyToken, transactionController.getSummary);
+router.get("/:id", verifyToken, transactionController.findOne);
+router.put("/:id", verifyToken, validateTransaction, transactionController.update);
+router.delete("/:id", verifyToken, transactionController.delete);
+
+module.exports = router;

@@ -56,3 +56,57 @@ module.exports = (sequelize, DataTypes) => {
 
   return Transaction;
 };
+module.exports = (sequelize, DataTypes) => {
+  const Transaction = sequelize.define("transaction", {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true
+    },
+    amount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    type: {
+      type: DataTypes.ENUM('income', 'expense'),
+      allowNull: false
+    },
+    date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+      defaultValue: DataTypes.NOW
+    },
+    paymentMethod: {
+      type: DataTypes.STRING
+    },
+    status: {
+      type: DataTypes.ENUM('pending', 'completed', 'cancelled'),
+      defaultValue: 'completed'
+    },
+    notes: {
+      type: DataTypes.TEXT
+    }
+  });
+
+  Transaction.associate = (models) => {
+    Transaction.belongsTo(models.user, {
+      foreignKey: 'userId',
+      as: 'user'
+    });
+    Transaction.belongsTo(models.category, {
+      foreignKey: 'categoryId',
+      as: 'category'
+    });
+    Transaction.belongsTo(models.channel, {
+      foreignKey: 'channelId',
+      as: 'channel',
+      allowNull: true
+    });
+  };
+
+  return Transaction;
+};
