@@ -1,0 +1,355 @@
+Prompt para Desenvolvimento do Módulo Financeiro do KOT (Keep On Track)
+Contexto do Projeto
+O KOT (Keep On Track) é uma plataforma SaaS desenvolvida para criadores de conteúdo, influenciadores, youtubers e freelancers. Estou desenvolvendo o módulo de gestão financeira e preciso da sua ajuda para criar todas as páginas, componentes, lógica e integração com banco de dados.
+Visão Geral do Módulo Financeiro
+O módulo financeiro do KOT possui 3 páginas principais:
+
+Dashboard Financeiro (página principal)
+Página de Transações (cadastro e listagem)
+Página de Patrimônio e Investimentos
+
+Tecnologias a Serem Utilizadas
+
+Frontend: React.js com Next.js
+Estilização: Tailwind CSS
+Componentes: Shadcn/UI
+Banco de Dados: Supabase (PostgreSQL)
+Autenticação: Supabase Auth
+Gráficos: Recharts
+Formulários: React Hook Form + Zod
+
+Estrutura de Banco de Dados Necessária
+Preciso que você desenvolva o schema completo para as seguintes tabelas no Supabase:
+
+financial_transactions
+
+id (UUID, PK)
+user_id (UUID, FK)
+date (timestamp)
+description (text)
+amount (decimal)
+type (enum: 'income', 'expense')
+category_id (UUID, FK)
+payment_method_id (UUID, FK)
+is_recurring (boolean)
+recurrence_period (enum: null, 'daily', 'weekly', 'monthly', 'yearly')
+recurrence_end_date (timestamp, nullable)
+tags (array)
+receipt_url (text, nullable)
+created_at (timestamp)
+updated_at (timestamp)
+
+
+transaction_categories
+
+id (UUID, PK)
+user_id (UUID, FK)
+name (text)
+type (enum: 'income', 'expense')
+color (text)
+icon (text)
+is_default (boolean)
+created_at (timestamp)
+
+
+payment_methods
+
+id (UUID, PK)
+user_id (UUID, FK)
+name (text)
+icon (text)
+is_default (boolean)
+created_at (timestamp)
+
+
+assets
+
+id (UUID, PK)
+user_id (UUID, FK)
+name (text)
+type (enum: 'investment', 'property')
+value (decimal)
+acquisition_date (timestamp)
+location (text)
+monthly_return (decimal, nullable)
+notes (text, nullable)
+created_at (timestamp)
+updated_at (timestamp)
+
+
+asset_history
+
+id (UUID, PK)
+asset_id (UUID, FK)
+date (timestamp)
+value (decimal)
+notes (text, nullable)
+
+
+
+Requisitos Detalhados por Página
+1. Dashboard Financeiro
+Layout e Componentes
+Desenvolva uma página responsiva com:
+
+Cabeçalho:
+
+Título "Gestão Financeira"
+Seletor de mês/ano (componente personalizado com dropdown)
+Botões "Nova Receita" e "Nova Despesa" com ícones
+
+
+Resumo Financeiro:
+
+Conjunto de 4 cards com:
+
+Receitas totais (valor + comparação percentual com mês anterior)
+Despesas totais (valor + comparação percentual com mês anterior)
+Saldo do mês (valor + comparação percentual)
+Card personalizável (por padrão: "Maior categoria de despesa")
+
+
+Estilização: Cards com ícones, valores em destaque, indicadores de crescimento/queda em verde/vermelho
+
+
+Planilha de Fluxo de Caixa:
+
+Tabela interativa com cabeçalho fixo
+Colunas: Data, Descrição, Categoria, Método de Pagamento, Valor, Ações
+Agrupamento por data (com expansão/contração)
+Linhas de receitas com valores em verde, despesas em vermelho
+Ações: ícones para visualizar, editar e excluir
+
+
+Gráficos:
+
+Gráfico de barras empilhadas (receitas x despesas por dia/semana)
+Gráfico de pizza para distribuição de despesas por categoria
+Gráfico de linha mostrando evolução do saldo ao longo do mês
+
+
+Filtros Rápidos:
+
+Toggle buttons para "Todas", "Receitas", "Despesas"
+Dropdown para filtrar por categoria
+Input de busca por texto
+
+
+
+Funcionalidades JavaScript
+
+Crie uma função fetchDashboardData(userId, month, year) para obter dados do Supabase
+Implemente lógica para calcular saldos diários e totais
+Desenvolva estado para controlar filtros aplicados
+Crie modais para adição rápida de transações
+Implemente lógica para exportação de dados para CSV/PDF
+
+2. Página de Transações
+Layout e Componentes
+
+Formulário de Nova Transação:
+
+Layout em duas colunas (em desktop) ou empilhado (em mobile)
+Campos organizados em seções lógicas
+Validação visual em tempo real
+Estilização consistente com a identidade do KOT
+
+
+Campos do Formulário:
+
+Tipo de transação (toggle button Receita/Despesa)
+Data (datepicker personalizado)
+Valor (input com formatação automática de moeda)
+Categoria (select com ícones coloridos)
+Método de Pagamento (select com ícones)
+Descrição (textarea)
+Upload de comprovante (drag-and-drop + preview)
+Opção de recorrência (com campos condicionais para configuração)
+Tags (input de múltipla seleção com criação dinâmica)
+
+
+Lista de Transações:
+
+Tabela com paginação, ordenação e filtros avançados
+Toggle para visualização em lista ou grid
+Cards para visualização em grid com informações resumidas
+Estado vazio estilizado quando não há transações
+
+
+Filtros Avançados:
+
+Painel colapsável com múltiplos filtros
+Seletor de intervalo de datas
+Multi-select para categorias
+Slider para faixa de valores
+Checkbox para métodos de pagamento
+Busca por texto na descrição
+Botões "Aplicar Filtros" e "Limpar Filtros"
+
+
+
+Funcionalidades JavaScript
+
+Desenvolva uma função createTransaction(transactionData) para salvar no Supabase
+Implemente validação completa com React Hook Form + Zod
+Crie lógica para gerenciamento de transações recorrentes
+Implemente upload de comprovantes para storage do Supabase
+Desenvolva sistema de filtragem e paginação otimizada
+
+3. Página de Patrimônio e Investimentos
+Layout e Componentes
+
+Resumo do Patrimônio:
+
+Cards destacando valor total, distribuição e rendimento médio
+Gráfico de composição do patrimônio
+
+
+Formulário de Novo Ativo:
+
+Campos: Nome, Tipo, Valor, Data de aquisição, Localização/Instituição, Rendimento mensal, Observações
+Validação em tempo real
+Preview do ativo antes da confirmação
+
+
+Lista de Ativos:
+
+Tabela interativa ou grid de cards
+Informações resumidas com opção de expandir
+Ações para editar, atualizar valor e excluir
+
+
+
+Funcionalidades JavaScript
+
+Crie funções para gerenciamento completo de ativos no Supabase
+Implemente lógica para calcular rendimentos e projeções
+Desenvolva sistema para registro de histórico de valores
+Crie visualizações gráficas da evolução do patrimônio
+
+Componentes Compartilhados a Serem Desenvolvidos
+
+Seletor de Período:
+
+Componente reutilizável para navegação entre meses/anos
+Suporte a atalhos para "Mês Atual", "Mês Anterior", etc.
+
+
+Modal de Transação Rápida:
+
+Versão simplificada do formulário de transação
+Animações suaves de entrada/saída
+
+
+Widget de Detalhes da Transação:
+
+Card expansível com todas as informações
+Ações contextuais (editar, excluir, duplicar)
+
+
+Dropdown de Categorias:
+
+Componente personalizado com ícones e cores
+Opção de criar novas categorias
+
+
+Tabela de Transações:
+
+Componente reutilizável com suporte a diferentes visualizações
+Funcionalidades de ordenação, filtragem e paginação
+
+
+
+Estrutura de Arquivos Recomendada
+Copy/app
+  /financial
+    /dashboard
+      page.tsx
+      components/
+        DashboardHeader.tsx
+        FinancialSummary.tsx
+        CashflowTable.tsx
+        TransactionCharts.tsx
+        QuickFilters.tsx
+    /transactions
+      page.tsx
+      [id]/page.tsx
+      components/
+        TransactionForm.tsx
+        TransactionsList.tsx
+        AdvancedFilters.tsx
+    /assets
+      page.tsx
+      [id]/page.tsx
+      components/
+        AssetForm.tsx
+        AssetsList.tsx
+        PatrimonyOverview.tsx
+  /api
+    /financial
+      /transactions/route.ts
+      /assets/route.ts
+/components
+  /financial
+    TransactionModal.tsx
+    PeriodSelector.tsx
+    CategoryDropdown.tsx
+    PaymentMethodSelector.tsx
+    TransactionDetailWidget.tsx
+/lib
+  /financial
+    schema.ts
+    helpers.ts
+    hooks.ts
+    constants.ts
+Requisitos de UI/UX
+
+Paleta de cores: Utilizar as cores da identidade do KOT (primária: #3B82F6, secundária: #10B981)
+Tipografia: Inter como fonte principal
+Espaçamento consistente: sistema de 4px (4px, 8px, 16px, 24px, 32px)
+Componentes arredondados: border-radius de 8px
+Animações sutis nos elementos interativos
+Design responsivo para desktop, tablet e mobile
+Estado de carregamento (skeletons) para todas as operações assíncronas
+Mensagens de feedback para todas as ações do usuário
+Confirmação antes de ações destrutivas (exclusão)
+
+Inicialização do Banco de Dados
+Forneça scripts SQL completos para:
+
+Criação de todas as tabelas mencionadas
+Criação de relacionamentos e constraints
+Inserção de dados iniciais (categorias e métodos de pagamento padrão)
+Configuração de policies de segurança do Supabase
+
+Integrações a Serem Implementadas
+
+Supabase Auth:
+
+Todas as operações devem ser vinculadas ao usuário autenticado
+Implementar middleware de autenticação
+
+
+Supabase Storage:
+
+Para upload e armazenamento de comprovantes
+Geração de URLs seguras para visualização
+
+
+Recharts:
+
+Configuração detalhada para todos os gráficos
+Customização visual de acordo com a identidade do KOT
+
+
+
+Entregáveis Esperados
+
+Código-fonte completo e organizado de todas as páginas
+Componentes React reutilizáveis com tipagem TypeScript
+Schemas Zod para validação de formulários
+Scripts SQL para criação e inicialização das tabelas
+Funções de utilidade para manipulação de dados financeiros
+Documentação sobre como implementar e extender o módulo
+
+Por favor, desenvolva este módulo seguindo as melhores práticas de React, com componentes organizados, hooks personalizados, e estado global quando necessário. Utilize TanStack Query para gerenciamento de dados assíncronos e mantenha uma separação clara entre UI e lógica de negócios.

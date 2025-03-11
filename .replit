@@ -24,7 +24,7 @@ localPort = 3001
 externalPort = 3001
 
 [workflows]
-runButton = "Start Server"
+runButton = "KOT Backend"
 
 [[workflows.workflow]]
 name = "KOT Backend"
@@ -32,7 +32,7 @@ author = 40339782
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd backend && npm start"
+args = "cd backend && node server.js"
 
 [[workflows.workflow]]
 name = "Serve"

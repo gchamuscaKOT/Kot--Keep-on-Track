@@ -1,0 +1,389 @@
+Perfeito, agora tenho as informações de conexão com o Supabase. Vou criar um passo a passo para você implementar o módulo financeiro do KOT usando esses dados.
+Passo a Passo para Implementação do Módulo Financeiro
+1. Configuração Inicial
+
+Salve as variáveis de ambiente em um arquivo .env.local na raiz do seu projeto:
+CopyNEXT_PUBLIC_SUPABASE_URL=https://sypuogggumzcisypmbpv.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5cHVvZ2dndW16Y2lzeXBtYnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE2NTQwMDYsImV4cCI6MjA1NzIzMDAwNn0.8ARloSksk8Mv-9BMi9LIFJ1Og-6wvk6p0_nkp-sGgZM
+SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5cHVvZ2dndW16Y2lzeXBtYnB2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MTY1NDAwNiwiZXhwIjoyMDU3MjMwMDA2fQ.Dsp63EBPFuAniaCRQfQasd_hEILZjFSaTPDIBGkp3Ls
+
+Envie o prompt detalhado para o assistente do Replit (Claude 3.7), que irá criar a estrutura completa do seu módulo.
+
+2. Preparação do Banco de Dados
+Antes de implementar o código, execute os seguintes scripts SQL no editor SQL do Supabase para criar as tabelas necessárias:
+
+Acesse o painel do Supabase (https://app.supabase.com/)
+Selecione seu projeto
+Vá para a seção "SQL Editor"
+Crie um novo script chamado "KOT Financial Module Setup"
+Cole e execute o seguinte SQL:
+
+sqlCopy-- Criação das tabelas
+CREATE TYPE transaction_type AS ENUM ('income', 'expense');
+CREATE TYPE asset_type AS ENUM ('investment', 'property');
+CREATE TYPE recurrence_period AS ENUM ('daily', 'weekly', 'monthly', 'yearly');
+
+-- Tabela de categorias de transação
+CREATE TABLE transaction_categories (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    type transaction_type NOT NULL,
+    color TEXT NOT NULL,
+    icon TEXT NOT NULL,
+    is_default BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    
+    UNIQUE(user_id, name, type)
+);
+
+-- Tabela de métodos de pagamento
+CREATE TABLE payment_methods (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    icon TEXT NOT NULL,
+    is_default BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    
+    UNIQUE(user_id, name)
+);
+
+-- Tabela de transações financeiras
+CREATE TABLE financial_transactions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    date TIMESTAMP WITH TIME ZONE NOT NULL,
+    description TEXT,
+    amount DECIMAL(15, 2) NOT NULL,
+    type transaction_type NOT NULL,
+    category_id UUID REFERENCES transaction_categories(id),
+    payment_method_id UUID REFERENCES payment_methods(id),
+    is_recurring BOOLEAN DEFAULT false,
+    recurrence_period recurrence_period,
+    recurrence_end_date TIMESTAMP WITH TIME ZONE,
+    tags TEXT[] DEFAULT '{}',
+    receipt_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Tabela de ativos/patrimônio
+CREATE TABLE assets (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    type asset_type NOT NULL,
+    value DECIMAL(15, 2) NOT NULL,
+    acquisition_date TIMESTAMP WITH TIME ZONE NOT NULL,
+    location TEXT,
+    monthly_return DECIMAL(6, 2),
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Tabela de histórico de ativos
+CREATE TABLE asset_history (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    asset_id UUID NOT NULL REFERENCES assets(id) ON DELETE CASCADE,
+    date TIMESTAMP WITH TIME ZONE NOT NULL,
+    value DECIMAL(15, 2) NOT NULL,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Inserir categorias padrão para cada novo usuário
+CREATE OR REPLACE FUNCTION create_default_categories()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Categorias de Receita
+    INSERT INTO transaction_categories (user_id, name, type, color, icon, is_default)
+    VALUES 
+        (NEW.id, 'AdSense', 'income', '#10B981', 'youtube', TRUE),
+        (NEW.id, 'Publicidade', 'income', '#3B82F6', 'megaphone', TRUE),
+        (NEW.id, 'Vendas', 'income', '#F59E0B', 'shopping-bag', TRUE),
+        (NEW.id, 'Serviços', 'income', '#8B5CF6', 'briefcase', TRUE),
+        (NEW.id, 'Outros', 'income', '#6B7280', 'plus-circle', TRUE);
+    
+    -- Categorias de Despesa
+    INSERT INTO transaction_categories (user_id, name, type, color, icon, is_default)
+    VALUES 
+        (NEW.id, 'Editor', 'expense', '#EF4444', 'edit', TRUE),
+        (NEW.id, 'Equipamentos', 'expense', '#F97316', 'camera', TRUE),
+        (NEW.id, 'Softwares', 'expense', '#6366F1', 'download', TRUE),
+        (NEW.id, 'Marketing', 'expense', '#EC4899', 'trending-up', TRUE),
+        (NEW.id, 'Produção', 'expense', '#10B981', 'film', TRUE),
+        (NEW.id, 'Impostos', 'expense', '#64748B', 'receipt', TRUE),
+        (NEW.id, 'Outros', 'expense', '#6B7280', 'more-horizontal', TRUE);
+    
+    -- Métodos de Pagamento Padrão
+    INSERT INTO payment_methods (user_id, name, icon, is_default)
+    VALUES 
+        (NEW.id, 'Dinheiro', 'banknote', TRUE),
+        (NEW.id, 'Cartão de Crédito', 'credit-card', TRUE),
+        (NEW.id, 'Cartão de Débito', 'credit-card', TRUE),
+        (NEW.id, 'Transferência', 'refresh-cw', TRUE),
+        (NEW.id, 'Boleto', 'file-text', TRUE),
+        (NEW.id, 'Pix', 'zap', TRUE);
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger para criar categorias padrão quando um novo usuário é criado
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW
+    EXECUTE FUNCTION create_default_categories();
+
+-- Configurar RLS (Row Level Security)
+ALTER TABLE transaction_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payment_methods ENABLE ROW LEVEL SECURITY;
+ALTER TABLE financial_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE assets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE asset_history ENABLE ROW LEVEL SECURITY;
+
+-- Criar políticas para que usuários só possam ver/modificar seus próprios dados
+CREATE POLICY "Users can view their own categories" 
+    ON transaction_categories FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own categories" 
+    ON transaction_categories FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own categories" 
+    ON transaction_categories FOR UPDATE
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own categories" 
+    ON transaction_categories FOR DELETE
+    USING (auth.uid() = user_id);
+
+-- Políticas similares para as outras tabelas
+CREATE POLICY "Users can view their own payment methods" 
+    ON payment_methods FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own payment methods" 
+    ON payment_methods FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own payment methods" 
+    ON payment_methods FOR UPDATE
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own payment methods" 
+    ON payment_methods FOR DELETE
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can view their own transactions" 
+    ON financial_transactions FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own transactions" 
+    ON financial_transactions FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own transactions" 
+    ON financial_transactions FOR UPDATE
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own transactions" 
+    ON financial_transactions FOR DELETE
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can view their own assets" 
+    ON assets FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own assets" 
+    ON assets FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own assets" 
+    ON assets FOR UPDATE
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own assets" 
+    ON assets FOR DELETE
+    USING (auth.uid() = user_id);
+
+-- Políticas para asset_history
+CREATE POLICY "Users can view history of their own assets" 
+    ON asset_history FOR SELECT
+    USING (EXISTS (
+        SELECT 1 FROM assets 
+        WHERE assets.id = asset_history.asset_id 
+        AND assets.user_id = auth.uid()
+    ));
+
+CREATE POLICY "Users can insert history for their own assets" 
+    ON asset_history FOR INSERT
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM assets 
+        WHERE assets.id = asset_history.asset_id 
+        AND assets.user_id = auth.uid()
+    ));
+
+CREATE POLICY "Users can update history of their own assets" 
+    ON asset_history FOR UPDATE
+    USING (EXISTS (
+        SELECT 1 FROM assets 
+        WHERE assets.id = asset_history.asset_id 
+        AND assets.user_id = auth.uid()
+    ))
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM assets 
+        WHERE assets.id = asset_history.asset_id 
+        AND assets.user_id = auth.uid()
+    ));
+
+CREATE POLICY "Users can delete history of their own assets" 
+    ON asset_history FOR DELETE
+    USING (EXISTS (
+        SELECT 1 FROM assets 
+        WHERE assets.id = asset_history.asset_id 
+        AND assets.user_id = auth.uid()
+    ));
+
+-- Criar índices para melhorar o desempenho
+CREATE INDEX idx_financial_transactions_user_id ON financial_transactions(user_id);
+CREATE INDEX idx_financial_transactions_date ON financial_transactions(date);
+CREATE INDEX idx_financial_transactions_type ON financial_transactions(type);
+CREATE INDEX idx_financial_transactions_category_id ON financial_transactions(category_id);
+CREATE INDEX idx_assets_user_id ON assets(user_id);
+CREATE INDEX idx_asset_history_asset_id ON asset_history(asset_id);
+3. Configuração do Storage no Supabase
+Para armazenar os comprovantes de transações, você precisará configurar o bucket do Storage no Supabase:
+
+No painel do Supabase, vá para "Storage"
+Crie um novo bucket chamado "transaction-receipts"
+Configure as permissões do bucket:
+
+Ative RLS (Row Level Security)
+Crie políticas para permitir que os usuários façam upload, visualizem e excluam apenas seus próprios arquivos:
+
+
+
+sqlCopy-- Política para visualização de arquivos
+CREATE POLICY "Users can view their own receipts"
+ON storage.objects FOR SELECT
+USING (auth.uid() = owner);
+
+-- Política para upload de arquivos
+CREATE POLICY "Users can upload receipts"
+ON storage.objects FOR INSERT
+WITH CHECK (auth.uid() = owner);
+
+-- Política para exclusão de arquivos
+CREATE POLICY "Users can delete their own receipts"
+ON storage.objects FOR DELETE
+USING (auth.uid() = owner);
+4. Implementação do Código
+Após receber o código do assistente do Replit, siga estas etapas:
+
+Estruturar as pastas conforme o layout sugerido no prompt
+Instalar as dependências necessárias:
+bashCopynpm install @supabase/supabase-js @tanstack/react-query @hookform/resolvers zod recharts date-fns react-hook-form @supabase/auth-helpers-nextjs
+
+Configurar o Shadcn/UI:
+bashCopynpx shadcn-ui@latest init
+
+Siga o assistente para configurar de acordo com seu projeto
+
+
+Instalar componentes do Shadcn/UI necessários:
+bashCopynpx shadcn-ui@latest add button card table form input select textarea tabs dropdown-menu dialog toast skeleton
+
+Inicializar o cliente do Supabase:
+Crie um arquivo lib/supabase.ts com o seguinte conteúdo:
+typescriptCopyimport { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+Configurar middleware para autenticação:
+Crie um arquivo middleware.ts na raiz do projeto:
+typescriptCopyimport { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next();
+  const supabase = createMiddlewareClient({ req, res });
+  
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  
+  // Se não houver sessão e a rota for protegida, redirecionar para login
+  if (!session && req.nextUrl.pathname.startsWith('/financial')) {
+    const redirectUrl = req.nextUrl.clone();
+    redirectUrl.pathname = '/login';
+    redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname);
+    return NextResponse.redirect(redirectUrl);
+  }
+  
+  return res;
+}
+
+export const config = {
+  matcher: ['/financial/:path*'],
+};
+
+
+5. Implementação e Testes
+Depois de receber e implementar o código gerado pelo Claude:
+
+Teste cada página individualmente:
+
+Verifique o Dashboard e suas funcionalidades
+Confirme se o formulário de transações está funcionando
+Teste a criação e visualização de patrimônio e investimentos
+
+
+Resolva quaisquer problemas de integração:
+
+Ajuste os hooks para gerenciamento de estado
+Verifique as chamadas de API para o Supabase
+Confirme que a autenticação está funcionando corretamente
+
+
+Teste a responsividade:
+
+Verifique como o layout se comporta em diferentes tamanhos de tela
+Ajuste os componentes conforme necessário
+
+
+
+6. Funcionalidades Avançadas
+Depois que o básico estiver funcionando, implemente estas funcionalidades avançadas:
+
+Exportação de dados:
+
+Adicione funções para exportar transações para CSV ou PDF
+Implemente filtros para a exportação
+
+
+Sistema de recorrência:
+
+Implemente a lógica para criar transações recorrentes
+Adicione rotinas para verificar e criar transações recorrentes programadas
+
+
+Previsões e análises:
+
+Adicione visualizações para previsões de fluxo de caixa
+Implemente análises de tendências de gastos
+
+
+
+Seguindo estes passos e utilizando o código completo gerado pelo assistente do Replit, você terá um módulo financeiro robusto e funcional para o KOT, perfeitamente integrado com o Supabase e seguindo as melhores práticas de desenvolvimento front-end moderno.
