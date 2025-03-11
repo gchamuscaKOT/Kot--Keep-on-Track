@@ -1,4 +1,3 @@
-
 /**
  * Dashboard Financeiro - KOT (Keep on Track)
  */
@@ -119,68 +118,6 @@
         },
         position: 'top',
         horizontalAlign: 'right'
-      } {
-        categories: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-        axisBorder: {
-          show: false
-        },
-        axisTicks: {
-          show: false
-        },
-        labels: {
-          style: {
-            colors: labelColor
-          }
-        }
-      },
-      yaxis: {
-        title: {
-          text: 'Valores (R$)',
-          style: {
-            fontSize: '13px',
-            colors: legendColor
-          }
-        },
-        labels: {
-          formatter: function (val) {
-            return 'R$ ' + val.toLocaleString('pt-BR');
-          },
-          style: {
-            colors: labelColor
-          }
-        }
-      },
-      legend: {
-        position: 'top',
-        fontSize: '13px',
-        markers: {
-          size: 10,
-          radius: 10
-        },
-        itemMargin: {
-          horizontal: 10,
-          vertical: 0
-        },
-        labels: {
-          colors: legendColor
-        }
-      },
-      fill: {
-        opacity: [0.85, 0.85, 1],
-        gradient: {
-          inverseColors: false,
-          shade: 'light',
-          type: 'vertical',
-          opacityFrom: 0.85,
-          opacityTo: 0.55
-        }
-      },
-      tooltip: {
-        y: {
-          formatter: function (val) {
-            return 'R$ ' + val.toLocaleString('pt-BR');
-          }
-        }
       }
     };
 
@@ -371,28 +308,419 @@
       return new bootstrap.Tooltip(tooltipTriggerEl);
     });
   });
-})();
-/**
- * Dashboard Financeiro
- */
-document.addEventListener('DOMContentLoaded', function () {
-  'use strict';
 
-  let cardColor, headingColor, labelColor, borderColor, legendColor;
 
-  if (isDarkStyle) {
-    cardColor = config.colors_dark.cardColor;
-    headingColor = config.colors_dark.headingColor;
-    labelColor = config.colors_dark.textMuted;
-    legendColor = config.colors_dark.bodyColor;
-    borderColor = config.colors_dark.borderColor;
-  } else {
-    cardColor = config.colors.cardColor;
-    headingColor = config.colors.headingColor;
-    labelColor = config.colors.textMuted;
-    legendColor = config.colors.bodyColor;
-    borderColor = config.colors.borderColor;
+  /**
+   * Financial Dashboard - Javascript
+   */
+
+  // Configuração Global
+  const primaryColor = config.colors.primary;
+  const successColor = config.colors.success;
+  const dangerColor = config.colors.danger;
+  const warningColor = config.colors.warning;
+  const infoColor = config.colors.info;
+
+  // Dados para o gráfico de fluxo de caixa
+  const financialChartEl2 = document.querySelector('#financialChart');
+  if (financialChartEl2) {
+    const financialChartConfig2 = {
+      chart: {
+        height: 400,
+        type: 'line',
+        toolbar: {
+          show: false
+        }
+      },
+      series: [
+        {
+          name: 'Receitas',
+          type: 'column',
+          data: [4500, 5200, 4800, 5900, 6800, 7200, 8100, 7400, 9100, 8700, 9600, 12628]
+        },
+        {
+          name: 'Despesas',
+          type: 'column',
+          data: [2800, 2900, 2700, 3200, 3800, 3500, 3900, 3600, 4100, 4300, 4200, 4679]
+        },
+        {
+          name: 'Saldo',
+          type: 'line',
+          data: [1700, 2300, 2100, 2700, 3000, 3700, 4200, 3800, 5000, 4400, 5400, 7949]
+        }
+      ],
+      colors: [primaryColor, dangerColor, successColor],
+      stroke: {
+        curve: 'smooth',
+        width: [0, 0, 3]
+      },
+      dataLabels: {
+        enabled: false
+      },
+      legend: {
+        show: true,
+        position: 'top',
+        horizontalAlign: 'left',
+        fontFamily: 'Public Sans',
+        markers: {
+          height: 12,
+          width: 12,
+          radius: 12,
+          offsetX: -3
+        },
+        labels: {
+          colors: labelColor
+        },
+        itemMargin: {
+          horizontal: 15
+        }
+      },
+      grid: {
+        borderColor: borderColor,
+        padding: {
+          top: 0,
+          bottom: -8,
+          left: 20,
+          right: 20
+        }
+      },
+      xaxis: {
+        categories: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+        labels: {
+          style: {
+            fontSize: '13px',
+            colors: labelColor,
+            fontFamily: 'Public Sans'
+          }
+        },
+        axisTicks: {
+          show: false
+        },
+        axisBorder: {
+          show: false
+        }
+      },
+      yaxis: {
+        labels: {
+          style: {
+            fontSize: '13px',
+            colors: labelColor,
+            fontFamily: 'Public Sans'
+          },
+          formatter: function(val) {
+            return 'R$ ' + val.toFixed(0);
+          }
+        }
+      },
+      responsive: [
+        {
+          breakpoint: 1700,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 10,
+                columnWidth: '32%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 1580,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 10,
+                columnWidth: '35%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 1440,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 10,
+                columnWidth: '42%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 1300,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 10,
+                columnWidth: '48%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 1200,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 10,
+                columnWidth: '40%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 1040,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 11,
+                columnWidth: '48%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 991,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 10,
+                columnWidth: '30%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 840,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 10,
+                columnWidth: '35%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 768,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 10,
+                columnWidth: '28%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 640,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 10,
+                columnWidth: '32%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 576,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 10,
+                columnWidth: '37%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 480,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 10,
+                columnWidth: '45%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 420,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 10,
+                columnWidth: '52%'
+              }
+            }
+          }
+        },
+        {
+          breakpoint: 380,
+          options: {
+            plotOptions: {
+              bar: {
+                borderRadius: 10,
+                columnWidth: '60%'
+              }
+            }
+          }
+        }
+      ],
+      states: {
+        hover: {
+          filter: {
+            type: 'none'
+          }
+        },
+        active: {
+          filter: {
+            type: 'none'
+          }
+        }
+      },
+      title: {
+        text: 'Fluxo de Caixa 2023',
+        align: 'left',
+        style: {
+          fontSize: '14px',
+          color: headingColor,
+          fontFamily: 'Public Sans'
+        }
+      },
+      subtitle: {
+        text: 'Análise mensal de receitas, despesas e saldo',
+        align: 'left',
+        style: {
+          fontSize: '12px',
+          color: labelColor,
+          fontFamily: 'Public Sans'
+        }
+      },
+      tooltip: {
+        shared: true,
+        intersect: false,
+        y: {
+          formatter: function(value) {
+            return 'R$ ' + value.toFixed(2);
+          }
+        }
+      }
+    };
+
+    const financialChart2 = new ApexCharts(financialChartEl2, financialChartConfig2);
+    financialChart2.render();
+
+    // Adicionar categoria por gráfico (pizza)
+    const categoryChartEl = document.querySelector('#categoryChart');
+    if (categoryChartEl) {
+      const categoryChartConfig = {
+        chart: {
+          height: 300,
+          type: 'donut'
+        },
+        labels: ['AdSense', 'Patrocínios', 'Afiliados', 'Serviços', 'Outros'],
+        series: [4500, 3600, 1800, 2100, 950],
+        colors: [primaryColor, successColor, warningColor, infoColor, config.colors.secondary],
+        stroke: {
+          width: 0
+        },
+        dataLabels: {
+          enabled: false,
+          formatter: function(val, opt) {
+            return opt.w.globals.labels[opt.dataPointIndex] + ': ' + val + '%';
+          }
+        },
+        legend: {
+          show: true,
+          position: 'bottom',
+          fontFamily: 'Public Sans',
+          labels: {
+            colors: labelColor
+          }
+        },
+        title: {
+          text: 'Receitas por Categoria',
+          align: 'center',
+          style: {
+            fontSize: '14px',
+            color: headingColor,
+            fontFamily: 'Public Sans'
+          }
+        },
+        tooltip: {
+          y: {
+            formatter: function(value) {
+              return 'R$ ' + value.toFixed(2);
+            }
+          }
+        }
+      };
+
+      const categoryChart = new ApexCharts(categoryChartEl, categoryChartConfig);
+      categoryChart.render();
+    }
+
+    // Adicionar gráfico de despesas por categoria 
+    const expenseCategoryChartEl = document.querySelector('#expenseCategoryChart');
+    if (expenseCategoryChartEl) {
+      const expenseCategoryChartConfig = {
+        chart: {
+          height: 300,
+          type: 'donut'
+        },
+        labels: ['Equipamentos', 'Software', 'Impostos', 'Marketing', 'Outros'],
+        series: [1800, 950, 780, 650, 490],
+        colors: [dangerColor, warningColor, infoColor, config.colors.secondary, config.colors.info],
+        stroke: {
+          width: 0
+        },
+        dataLabels: {
+          enabled: false,
+          formatter: function(val, opt) {
+            return opt.w.globals.labels[opt.dataPointIndex] + ': ' + val + '%';
+          }
+        },
+        legend: {
+          show: true,
+          position: 'bottom',
+          fontFamily: 'Public Sans',
+          labels: {
+            colors: labelColor
+          }
+        },
+        title: {
+          text: 'Despesas por Categoria',
+          align: 'center',
+          style: {
+            fontSize: '14px',
+            color: headingColor,
+            fontFamily: 'Public Sans'
+          }
+        },
+        tooltip: {
+          y: {
+            formatter: function(value) {
+              return 'R$ ' + value.toFixed(2);
+            }
+          }
+        }
+      };
+
+      const expenseCategoryChart = new ApexCharts(expenseCategoryChartEl, expenseCategoryChartConfig);
+      expenseCategoryChart.render();
+    }
   }
+
+  // Atualização dinâmica dos cards de informação
+  const updateStatistics = () => {
+    // Esta função poderia conectar-se ao backend para obter dados atualizados em tempo real
+    console.log('Estatísticas atualizadas');
+  };
+
+  // Atualizar estatísticas a cada 30 segundos
+  setInterval(updateStatistics, 30000);
 
   // Função para carregar dados do backend
   const loadDashboardData = async () => {
@@ -401,17 +729,17 @@ document.addEventListener('DOMContentLoaded', function () {
       const today = new Date();
       const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
       const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-      
+
       const startDate = firstDay.toISOString().split('T')[0];
       const endDate = lastDay.toISOString().split('T')[0];
-      
+
       // Fazer requisição para o backend
       const response = await fetch(`/api/transactions/summary?start_date=${startDate}&end_date=${endDate}`);
-      
+
       if (!response.ok) {
         throw new Error('Erro ao carregar dados do dashboard');
       }
-      
+
       const data = await response.json();
       updateDashboardCards(data);
       updateFinancialChart(data);
@@ -430,14 +758,14 @@ document.addEventListener('DOMContentLoaded', function () {
       document.querySelector('#totalIncome').textContent = `R$ ${data.summary.income.toFixed(2).replace('.', ',')}`;
       document.querySelector('#totalExpenses').textContent = `R$ ${data.summary.expense.toFixed(2).replace('.', ',')}`;
       document.querySelector('#totalProfit').textContent = `R$ ${data.summary.balance.toFixed(2).replace('.', ',')}`;
-      
+
       // Adicionar percentuais de crescimento
       if (data.growth) {
         document.querySelector('#incomeGrowth').textContent = `${data.growth.income > 0 ? '+' : ''}${data.growth.income.toFixed(2)}%`;
         document.querySelector('#expenseGrowth').textContent = `${data.growth.expense > 0 ? '+' : ''}${data.growth.expense.toFixed(2)}%`;
         document.querySelector('#profitGrowth').textContent = `${data.growth.balance > 0 ? '+' : ''}${data.growth.balance.toFixed(2)}%`;
         document.querySelector('#overallGrowth').textContent = `${data.growth.overall > 0 ? '+' : ''}${data.growth.overall.toFixed(2)}%`;
-        
+
         // Ajustar classes para indicar crescimento positivo/negativo
         document.querySelector('#incomeGrowth').className = data.growth.income >= 0 ? 'text-success fw-semibold' : 'text-danger fw-semibold';
         document.querySelector('#expenseGrowth').className = data.growth.expense <= 0 ? 'text-success fw-semibold' : 'text-danger fw-semibold';
@@ -453,7 +781,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (financialChartEl) {
       // Usar dados da API se disponíveis, ou dados de demonstração
       let months, incomeData, expenseData, profitData;
-      
+
       if (data && data.monthly) {
         months = data.monthly.map(item => item.month);
         incomeData = data.monthly.map(item => item.income);
@@ -466,7 +794,7 @@ document.addEventListener('DOMContentLoaded', function () {
         expenseData = [2000, 1800, 2300, 2800, 3100, 3500, 3800, 3500, 4100, 4500, 4600, 4679];
         profitData = incomeData.map((income, index) => income - expenseData[index]);
       }
-      
+
       const financialChartConfig = {
         chart: {
           height: 400,
@@ -562,7 +890,7 @@ document.addEventListener('DOMContentLoaded', function () {
           horizontalAlign: 'right'
         }
       };
-      
+
       const financialChart = new ApexCharts(financialChartEl, financialChartConfig);
       financialChart.render();
     }
@@ -573,7 +901,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Dados para o gráfico de categorias
     let incomeCategories = [], incomeValues = [];
     let expenseCategories = [], expenseValues = [];
-    
+
     if (data && data.categories) {
       // Separar categorias de receita e despesa
       data.categories.forEach(cat => {
@@ -589,11 +917,11 @@ document.addEventListener('DOMContentLoaded', function () {
       // Dados de demonstração
       incomeCategories = ['AdSense', 'Patrocínio', 'Afiliados', 'Vendas'];
       incomeValues = [5600, 4200, 1800, 1000];
-      
+
       expenseCategories = ['Equipamento', 'Software', 'Serviços', 'Impostos'];
       expenseValues = [2300, 1200, 800, 400];
     }
-    
+
     // Gráfico de categorias de receita
     const incomeCategoryEl = document.querySelector('#incomeCategoryChart');
     if (incomeCategoryEl) {
@@ -605,9 +933,9 @@ document.addEventListener('DOMContentLoaded', function () {
         labels: incomeCategories,
         series: incomeValues,
         colors: [
-          config.colors.primary, 
-          config.colors.info, 
-          config.colors.success, 
+          config.colors.primary,
+          config.colors.info,
+          config.colors.success,
           config.colors.secondary
         ],
         stroke: {
@@ -620,11 +948,11 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         }
       };
-      
+
       const incomeCategoryChart = new ApexCharts(incomeCategoryEl, incomeCategoryConfig);
       incomeCategoryChart.render();
     }
-    
+
     // Gráfico de categorias de despesa
     const expenseCategoryEl = document.querySelector('#expenseCategoryChart');
     if (expenseCategoryEl) {
@@ -636,9 +964,9 @@ document.addEventListener('DOMContentLoaded', function () {
         labels: expenseCategories,
         series: expenseValues,
         colors: [
-          config.colors.danger, 
-          config.colors.warning, 
-          config.colors.dark, 
+          config.colors.danger,
+          config.colors.warning,
+          config.colors.dark,
           config.colors.gray
         ],
         stroke: {
@@ -651,7 +979,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         }
       };
-      
+
       const expenseCategoryChart = new ApexCharts(expenseCategoryEl, expenseCategoryConfig);
       expenseCategoryChart.render();
     }
@@ -687,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { month: 'Dez', income: 12628, expense: 4679, balance: 7949 }
       ],
       categories: [
-        { name: 'AdSense', type: 'income', total: 5628 },
+        { name: 'AdSense', type: ''income', total: 5628 },
         { name: 'Patrocínio', type: 'income', total: 4200 },
         { name: 'Afiliados', type: 'income', total: 1800 },
         { name: 'Vendas', type: 'income', total: 1000 },
@@ -697,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', function () {
         { name: 'Impostos', type: 'expense', total: 379 }
       ]
     };
-    
+
     updateDashboardCards(demoData);
     updateFinancialChart(demoData);
     updateCategoryCharts(demoData);
@@ -710,7 +1038,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!response.ok) {
         throw new Error('Erro ao carregar transações recentes');
       }
-      
+
       const data = await response.json();
       updateRecentTransactionsTable(data.transactions);
     } catch (error) {
@@ -723,23 +1051,23 @@ document.addEventListener('DOMContentLoaded', function () {
   const updateRecentTransactionsTable = (transactions) => {
     const tableBody = document.querySelector('#recentTransactionsTable tbody');
     if (!tableBody) return;
-    
+
     if (transactions && transactions.length > 0) {
       tableBody.innerHTML = '';
-      
+
       transactions.forEach(transaction => {
         const row = document.createElement('tr');
-        
+
         // Formatar os dados da transação
         const type = transaction.type === 'income' ? 'Receita' : 'Despesa';
-        const icon = transaction.type === 'income' 
-          ? '<i class="bx bx-trending-up text-success me-1"></i>' 
+        const icon = transaction.type === 'income'
+          ? '<i class="bx bx-trending-up text-success me-1"></i>'
           : '<i class="bx bx-trending-down text-danger me-1"></i>';
         const date = new Date(transaction.date).toLocaleDateString('pt-BR');
         const status = '<span class="badge bg-label-success me-1">Concluído</span>';
         const amount = `R$ ${parseFloat(transaction.amount).toFixed(2).replace('.', ',')}`;
         const amountClass = transaction.type === 'income' ? 'text-success' : 'text-danger';
-        
+
         // Construir a linha
         row.innerHTML = `
           <td>${icon} #${transaction.id.substring(0, 4)}</td>
@@ -764,7 +1092,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
           </td>
         `;
-        
+
         tableBody.appendChild(row);
       });
     }

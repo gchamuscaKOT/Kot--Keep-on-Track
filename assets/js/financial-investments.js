@@ -10,178 +10,215 @@ document.addEventListener('DOMContentLoaded', function () {
   const headingColor = config.colors.headingColor;
   const labelColor = config.colors.textMuted;
   const borderColor = config.colors.borderColor;
+  const primaryColor = config.colors.primary;
+  const successColor = config.colors.success;
+  const dangerColor = config.colors.danger;
+  const warningColor = config.colors.warning;
+  const infoColor = config.colors.info;
 
-  // Gráfico de Composição do Portfólio
+  // Portfólio - Gráfico de Composição
   const portfolioCompositionEl = document.querySelector('#portfolioComposition');
   if (portfolioCompositionEl) {
     const portfolioCompositionConfig = {
       chart: {
         height: 300,
-        type: 'pie',
-        toolbar: {
-          show: true
-        }
+        type: 'pie'
       },
-      series: [10000, 15700, 3500, 5000, 1650],
-      labels: ['Renda Fixa', 'Renda Variável', 'Fundos Imobiliários', 'Ações', 'Criptomoedas'],
-      colors: [
-        config.colors.primary,
-        config.colors.danger,
-        config.colors.warning,
-        config.colors.info,
-        config.colors.success
-      ],
-      dataLabels: {
-        enabled: true,
-        formatter: function(val) {
-          return val.toFixed(1) + "%";
-        }
+      labels: ['Renda Fixa', 'Renda Variável', 'Fundos Imobiliários', 'Criptomoedas'],
+      series: [15425.75, 16190.75, 3745, 1815],
+      colors: [primaryColor, dangerColor, warningColor, infoColor],
+      stroke: {
+        width: 0
       },
       legend: {
+        show: true,
         position: 'bottom',
-        markers: {
-          offsetX: -3
-        },
+        fontFamily: 'Public Sans',
         labels: {
           colors: labelColor
-        },
-        itemMargin: {
-          horizontal: 10,
-          vertical: 5
         }
       },
       tooltip: {
         y: {
           formatter: function(value) {
-            return 'R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            return 'R$ ' + value.toFixed(2);
           }
         }
       },
-      responsive: [
-        {
-          breakpoint: 992,
-          options: {
-            chart: {
-              height: 320
-            },
-            legend: {
-              position: 'bottom'
-            }
-          }
-        },
-        {
-          breakpoint: 576,
-          options: {
-            chart: {
-              height: 280
-            },
-            legend: {
-              position: 'bottom'
-            },
-            dataLabels: {
-              enabled: false
-            }
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          chart: {
+            width: 200
+          },
+          legend: {
+            position: 'bottom'
           }
         }
-      ]
+      }]
     };
 
-    const portfolioComposition = new ApexCharts(portfolioCompositionEl, portfolioCompositionConfig);
-    portfolioComposition.render();
+    const portfolioCompositionChart = new ApexCharts(portfolioCompositionEl, portfolioCompositionConfig);
+    portfolioCompositionChart.render();
   }
 
-  // Gráfico de Desempenho por Classe de Ativo
+  // Desempenho por Classe de Ativo
   const assetClassPerformanceEl = document.querySelector('#assetClassPerformance');
   if (assetClassPerformanceEl) {
     const assetClassPerformanceConfig = {
       chart: {
         height: 300,
-        type: 'bar',
-        toolbar: {
-          show: true
-        }
+        type: 'bar'
       },
       plotOptions: {
         bar: {
           horizontal: false,
-          columnWidth: '50%',
-          borderRadius: 3
-        }
+          columnWidth: '55%',
+          borderRadius: 4
+        },
       },
-      series: [
-        {
-          name: 'Rentabilidade (%)',
-          data: [8.5, 5.2, 7.0, -2.3, 10.0]
-        }
-      ],
-      colors: [config.colors.primary],
       dataLabels: {
         enabled: false
       },
+      stroke: {
+        show: true,
+        width: 2,
+        colors: ['transparent']
+      },
+      series: [{
+        name: 'Retorno Anual (%)',
+        data: [8.5, 5.0, 7.0, 10.0]
+      }],
       xaxis: {
-        categories: ['Renda Fixa', 'Renda Variável', 'Fundos Imobiliários', 'Ações', 'Criptomoedas'],
-        axisBorder: {
-          show: false
-        },
-        axisTicks: {
-          show: false
-        },
+        categories: ['Renda Fixa', 'Renda Variável', 'Fundos Imobiliários', 'Criptomoedas'],
         labels: {
           style: {
-            colors: labelColor
+            colors: labelColor,
+            fontFamily: 'Public Sans'
           }
         }
       },
       yaxis: {
         title: {
-          text: 'Rentabilidade (%)',
+          text: 'Retorno Anual (%)',
           style: {
-            fontSize: '14px',
-            fontFamily: 'Public Sans',
-            color: headingColor
+            color: labelColor,
+            fontFamily: 'Public Sans'
           }
         },
         labels: {
           style: {
-            colors: labelColor
+            colors: labelColor,
+            fontFamily: 'Public Sans'
           }
         }
       },
-      grid: {
-        borderColor: borderColor
+      fill: {
+        opacity: 1
       },
       tooltip: {
         y: {
           formatter: function(val) {
-            return val + '%';
+            return val + "%";
           }
         }
-      }
+      },
+      colors: [primaryColor]
     };
 
-    const assetClassPerformance = new ApexCharts(assetClassPerformanceEl, assetClassPerformanceConfig);
-    assetClassPerformance.render();
+    const assetClassPerformanceChart = new ApexCharts(assetClassPerformanceEl, assetClassPerformanceConfig);
+    assetClassPerformanceChart.render();
   }
 
-  // Evento para salvar novo investimento
+  // Formulário de novo investimento
+  const newInvestmentForm = document.getElementById('newInvestmentForm');
   const saveInvestmentBtn = document.getElementById('saveInvestment');
-  if (saveInvestmentBtn) {
+
+  if (newInvestmentForm && saveInvestmentBtn) {
     saveInvestmentBtn.addEventListener('click', function() {
-      const form = document.getElementById('newInvestmentForm');
-      
-      // Verificar se todos os campos obrigatórios estão preenchidos
-      if (form.checkValidity()) {
-        // Em uma aplicação real, enviaria os dados para o servidor
-        alert('Investimento adicionado com sucesso!');
-        
-        // Fechar o modal e limpar o formulário
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addInvestmentModal'));
-        modal.hide();
-        form.reset();
-      } else {
-        // Forçar validação do formulário
-        form.reportValidity();
+      // Verificação simples de validação
+      const assetName = document.getElementById('assetName').value;
+      const assetClass = document.getElementById('assetClass').value;
+      const investedAmount = document.getElementById('investedAmount').value;
+      const acquisitionDate = document.getElementById('acquisitionDate').value;
+
+      if (!assetName || !assetClass || !investedAmount || !acquisitionDate) {
+        alert('Por favor, preencha todos os campos obrigatórios.');
+        return;
       }
+
+      // Simulação de adição de novo investimento
+      const currentValue = document.getElementById('currentValue').value || investedAmount;
+      const maturityDate = document.getElementById('maturityDate').value || '';
+      const notes = document.getElementById('investmentNotes').value || '';
+
+      // Calcular rentabilidade simulada
+      const rentability = ((parseFloat(currentValue) / parseFloat(investedAmount) - 1) * 100).toFixed(2);
+      const rentabilityClass = parseFloat(rentability) >= 0 ? 'text-success' : 'text-danger';
+      const rentabilitySymbol = parseFloat(rentability) >= 0 ? '+' : '';
+
+      // Formatar data para exibição
+      const formattedDate = formatDate(acquisitionDate);
+
+      // Criar nova linha para a tabela
+      const table = document.querySelector('.table-hover tbody');
+      if (table) {
+        const newRow = document.createElement('tr');
+        
+        // Definir classe do badge com base no tipo de ativo
+        let badgeClass = 'bg-label-primary';
+        if (assetClass === 'renda_variavel') badgeClass = 'bg-label-danger';
+        if (assetClass === 'fundos_imobiliarios') badgeClass = 'bg-label-warning';
+        if (assetClass === 'cripto') badgeClass = 'bg-label-info';
+        
+        // Formatar nome da classe para exibição
+        const assetClassNames = {
+          'renda_fixa': 'Renda Fixa',
+          'renda_variavel': 'Renda Variável',
+          'fundos_imobiliarios': 'Fundos Imobiliários',
+          'cripto': 'Cripto',
+          'outros': 'Outros'
+        };
+        
+        newRow.innerHTML = `
+          <td>${assetName}</td>
+          <td><span class="badge ${badgeClass}">${assetClassNames[assetClass]}</span></td>
+          <td>R$ ${parseFloat(investedAmount).toFixed(2).replace('.', ',')}</td>
+          <td>R$ ${parseFloat(currentValue).toFixed(2).replace('.', ',')}</td>
+          <td><span class="${rentabilityClass}">${rentabilitySymbol}${rentability}%</span></td>
+          <td>${formattedDate}</td>
+          <td>
+            <div class="dropdown">
+              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                <i class="bx bx-dots-vertical-rounded"></i>
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-edit-alt me-1"></i> Editar</a>
+                <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Excluir</a>
+                <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-bar-chart-alt-2 me-1"></i> Desempenho</a>
+              </div>
+            </div>
+          </td>
+        `;
+        
+        table.prepend(newRow);
+      }
+
+      // Fechar o modal e limpar o formulário
+      newInvestmentForm.reset();
+      const modal = bootstrap.Modal.getInstance(document.getElementById('addInvestmentModal'));
+      if (modal) {
+        modal.hide();
+      }
+
+      // Mostrar mensagem de sucesso
+      alert('Investimento adicionado com sucesso!');
     });
+  }
+
+  // Função para formatar data
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
   }
 });
