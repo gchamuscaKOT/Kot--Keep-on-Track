@@ -1,268 +1,430 @@
+
 /**
- * Gerenciamento de Transações Financeiras - KOT (Keep on Track)
+ * Transações Financeiras - Javascript
  */
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
 
-'use strict';
+  // Configuração Global
+  const cardColor = config.colors.cardColor;
+  const headingColor = config.colors.headingColor;
+  const labelColor = config.colors.textMuted;
+  const borderColor = config.colors.borderColor;
+  const primaryColor = config.colors.primary;
+  const successColor = config.colors.success;
+  const dangerColor = config.colors.danger;
+  const warningColor = config.colors.warning;
+  const infoColor = config.colors.info;
 
-// Array para armazenar as transações
-let transactions = [
-  {
-    id: '1258',
-    date: '12/06/2023',
-    description: 'Pagamento de patrocínio',
-    category: 'Patrocínio',
-    channel: 'Instagram',
-    amount: 1200.00,
-    type: 'income',
-    status: 'Concluído'
-  },
-  {
-    id: '1257',
-    date: '10/06/2023',
-    description: 'Equipamento de gravação',
-    category: 'Equipamento',
-    channel: 'YouTube',
-    amount: 750.00,
-    type: 'expense',
-    status: 'Concluído'
-  },
-  {
-    id: '1256',
-    date: '08/06/2023',
-    description: 'Monetização YouTube',
-    category: 'AdSense',
-    channel: 'YouTube',
-    amount: 850.75,
-    type: 'income',
-    status: 'Concluído'
-  },
-  {
-    id: '1255',
-    date: '05/06/2023',
-    description: 'Software de edição',
-    category: 'Software',
-    channel: '',
-    amount: 129.99,
-    type: 'expense',
-    status: 'Concluído'
-  },
-  {
-    id: '1254',
-    date: '01/06/2023',
-    description: 'Patrocínio Instagram',
-    category: 'Patrocínio',
-    channel: 'Instagram',
-    amount: 500.00,
-    type: 'income',
-    status: 'Concluído'
-  }
-];
+  // Definir o tema (necessário para resolver o erro isDarkStyle)
+  const isDarkStyle = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-// Função para gerar um ID único
-function generateID() {
-  return Date.now().toString().slice(-4);
-}
+  // Dados simulados de transações que seriam obtidos de um backend real
+  const mockTransactionsData = {
+    // Transações
+    transactions: [
+      {
+        id: 1258,
+        date: '2023-06-12',
+        description: 'Pagamento de patrocínio - Empresa XYZ',
+        category: 'Patrocínio',
+        amount: 1200.00,
+        status: 'Concluído',
+        type: 'income',
+        account: 'Banco Principal',
+        notes: 'Campanha de marketing de junho'
+      },
+      {
+        id: 1257,
+        date: '2023-06-10',
+        description: 'Equipamento de gravação - Câmera DSLR',
+        category: 'Equipamento',
+        amount: 750.00,
+        status: 'Concluído',
+        type: 'expense',
+        account: 'Cartão de Crédito',
+        notes: 'Upgrade para melhorar qualidade dos vídeos'
+      },
+      {
+        id: 1256,
+        date: '2023-06-08',
+        description: 'Monetização YouTube',
+        category: 'AdSense',
+        amount: 850.75,
+        status: 'Concluído',
+        type: 'income',
+        account: 'Banco Principal',
+        notes: 'Pagamento referente a maio/2023'
+      },
+      {
+        id: 1255,
+        date: '2023-06-05',
+        description: 'Software de edição - Adobe Creative Cloud',
+        category: 'Software',
+        amount: 129.99,
+        status: 'Concluído',
+        type: 'expense',
+        account: 'Cartão de Crédito',
+        notes: 'Assinatura mensal'
+      },
+      {
+        id: 1254,
+        date: '2023-06-01',
+        description: 'Patrocínio Instagram - Marca ABC',
+        category: 'Patrocínio',
+        amount: 500.00,
+        status: 'Concluído',
+        type: 'income',
+        account: 'Banco Principal',
+        notes: 'Publicação patrocinada nos stories'
+      },
+      {
+        id: 1253,
+        date: '2023-05-28',
+        description: 'Conta de Internet',
+        category: 'Serviços',
+        amount: 89.90,
+        status: 'Concluído',
+        type: 'expense',
+        account: 'Débito Automático',
+        notes: 'Internet de alta velocidade para streaming'
+      },
+      {
+        id: 1252,
+        date: '2023-05-25',
+        description: 'Programa de Afiliados - Empresa DEF',
+        category: 'Afiliados',
+        amount: 320.50,
+        status: 'Concluído',
+        type: 'income',
+        account: 'Banco Principal',
+        notes: 'Comissões da segunda quinzena de maio'
+      },
+      {
+        id: 1251,
+        date: '2023-05-20',
+        description: 'Microfone profissional',
+        category: 'Equipamento',
+        amount: 450.00,
+        status: 'Concluído',
+        type: 'expense',
+        account: 'Cartão de Crédito',
+        notes: 'Microfone condensador para melhorar qualidade de áudio'
+      },
+      {
+        id: 1250,
+        date: '2023-05-15',
+        description: 'Monetização TikTok',
+        category: 'Plataformas',
+        amount: 425.30,
+        status: 'Concluído',
+        type: 'income',
+        account: 'Banco Principal',
+        notes: 'Pagamento de Creator Fund'
+      },
+      {
+        id: 1249,
+        date: '2023-05-10',
+        description: 'Iluminação para estúdio',
+        category: 'Equipamento',
+        amount: 280.00,
+        status: 'Concluído',
+        type: 'expense',
+        account: 'Cartão de Crédito',
+        notes: 'Ring light e softbox'
+      }
+    ],
+    
+    // Categorias para formulário de transações
+    categories: {
+      income: ['AdSense', 'Patrocínio', 'Afiliados', 'Plataformas', 'Serviços', 'Vendas', 'Outros'],
+      expense: ['Equipamento', 'Software', 'Serviços', 'Impostos', 'Marketing', 'Escritório', 'Outros']
+    },
+    
+    // Contas bancárias
+    accounts: ['Banco Principal', 'Cartão de Crédito', 'Poupança', 'Débito Automático', 'PayPal', 'Outro']
+  };
+  
+  // Função para carregar dados - simulando conexão com backend
+  const loadTransactionsData = async () => {
+    try {
+      // Em um ambiente real, aqui seria uma chamada fetch para o backend
+      // const response = await fetch('/api/financial/transactions');
+      // const data = await response.json();
+      
+      // Vamos simular uma resposta do backend usando os dados mocados
+      return mockTransactionsData;
+    } catch (error) {
+      console.error('Erro ao carregar dados de transações:', error);
+      return mockTransactionsData; // Usar dados simulados em caso de erro
+    }
+  };
 
-// Função para formatar valores monetários
-function formatCurrency(value) {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
+  // Inicialização da página de transações
+  const initTransactions = async () => {
+    const data = await loadTransactionsData();
+    renderTransactionsTable(data.transactions);
+    setupTransactionForm(data);
+  };
 
-// Função para formatar data
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('pt-BR');
-}
-
-// Função para adicionar uma nova transação
-function addTransaction(transaction) {
-  // Gerar ID para a nova transação
-  transaction.id = generateID();
-
-  // Adicionar ao início do array
-  transactions.unshift(transaction);
-
-  // Renderizar novamente a tabela
-  renderTransactions(transactions);
-}
-
-// Função para renderizar as transações na tabela
-function renderTransactions(transactionsArray) {
-  const tbody = document.querySelector('table tbody');
-
-  // Limpar corpo da tabela
-  if (tbody) {
-    tbody.innerHTML = '';
-
-    // Adicionar cada transação
-    transactionsArray.forEach(transaction => {
+  // Renderiza a tabela de transações
+  const renderTransactionsTable = (transactions) => {
+    const tableBody = document.querySelector('#transactionsTable tbody');
+    if (!tableBody) return;
+    
+    // Limpar tabela antes de adicionar novos dados
+    tableBody.innerHTML = '';
+    
+    // Adicionar cada transação à tabela
+    transactions.forEach(transaction => {
       const row = document.createElement('tr');
-
-      // Formatação de acordo com o tipo de transação
-      const iconClass = transaction.type === 'income' ? 'bx-trending-up text-success' : 'bx-trending-down text-danger';
-      const amountClass = transaction.type === 'income' ? 'text-success' : 'text-danger';
-      const categoryBadgeClass = transaction.type === 'income' ? 'bg-label-success' : 'bg-label-danger';
-
-      // HTML da linha
+      
+      // Determine o ícone com base no tipo de transação
+      const iconClass = transaction.type === 'income' ? 
+        'bx bx-trending-up text-success' : 'bx bx-trending-down text-danger';
+      
+      // Formatar a data para exibição
+      const dateParts = transaction.date.split('-');
+      const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+      
+      // Status badge class
+      const statusClass = transaction.status === 'Concluído' ? 
+        'badge bg-label-success' : 'badge bg-label-warning';
+      
+      // Valor formatado com R$
+      const formattedAmount = `R$ ${transaction.amount.toFixed(2)}`;
+      
+      // Construir o conteúdo HTML da linha
       row.innerHTML = `
-        <td><i class="bx ${iconClass} me-1"></i> #${transaction.id}</td>
-        <td>${transaction.date}</td>
+        <td><i class="${iconClass} me-1"></i> #${transaction.id}</td>
+        <td>${formattedDate}</td>
         <td>${transaction.description}</td>
-        <td><span class="badge ${categoryBadgeClass}">${transaction.category}</span></td>
-        <td>${transaction.channel ? `<i class="bx bxl-${transaction.channel.toLowerCase()} text-danger"></i> ${transaction.channel}` : '-'}</td>
-        <td><strong class="${amountClass}">${formatCurrency(transaction.amount)}</strong></td>
-        <td><span class="badge bg-label-success me-1">${transaction.status}</span></td>
+        <td>${transaction.category}</td>
+        <td>${transaction.type === 'income' ? formattedAmount : `-${formattedAmount}`}</td>
+        <td><span class="${statusClass} me-1">${transaction.status}</span></td>
         <td>
           <div class="dropdown">
             <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
               <i class="bx bx-dots-vertical-rounded"></i>
             </button>
             <div class="dropdown-menu">
-              <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-edit-alt me-1"></i> Editar</a>
-              <a class="dropdown-item" href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Excluir</a>
-              <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#transactionDetailsModal"><i class="bx bx-info-circle me-1"></i> Detalhes</a>
+              <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#transactionDetailsModal" data-transaction-id="${transaction.id}">
+                <i class="bx bx-show-alt me-1"></i> Detalhes
+              </a>
+              <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#editTransactionModal" data-transaction-id="${transaction.id}">
+                <i class="bx bx-edit-alt me-1"></i> Editar
+              </a>
+              <a class="dropdown-item" href="javascript:void(0);" onclick="confirmDeleteTransaction(${transaction.id})">
+                <i class="bx bx-trash me-1"></i> Excluir
+              </a>
             </div>
           </div>
         </td>
       `;
-
-      tbody.appendChild(row);
+      
+      tableBody.appendChild(row);
     });
-  }
-}
+    
+    // Adicionar event listeners para os botões de detalhes e edição
+    setupActionButtons(transactions);
+  };
 
-// Evento para quando o DOM estiver totalmente carregado
-document.addEventListener('DOMContentLoaded', function() {
-  // Renderizar transações iniciais
-  renderTransactions(transactions);
+  // Configurar listeners para botões de ação na tabela
+  const setupActionButtons = (transactions) => {
+    // Listener para modal de detalhes
+    document.querySelectorAll('[data-bs-target="#transactionDetailsModal"]').forEach(button => {
+      button.addEventListener('click', function() {
+        const transactionId = parseInt(this.dataset.transactionId);
+        const transaction = transactions.find(t => t.id === transactionId);
+        
+        if (transaction) {
+          // Preencher o modal com detalhes da transação
+          const modal = document.getElementById('transactionDetailsModal');
+          if (modal) {
+            const typeIcon = transaction.type === 'income' ? 
+              '<i class="bx bx-trending-up text-success fs-3 me-2"></i>' : 
+              '<i class="bx bx-trending-down text-danger fs-3 me-2"></i>';
+            
+            const typeLabel = transaction.type === 'income' ? 'Receita' : 'Despesa';
+            const dateParts = transaction.date.split('-');
+            const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+            
+            // Atualizar conteúdo do modal
+            modal.querySelector('.modal-title').innerHTML = `${typeIcon} ${transaction.description}`;
+            
+            const detailsContainer = modal.querySelector('.modal-body');
+            detailsContainer.innerHTML = `
+              <div class="transaction-details">
+                <div class="mb-3">
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="fw-semibold">ID:</span>
+                    <span>#${transaction.id}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="fw-semibold">Tipo:</span>
+                    <span>${typeLabel}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="fw-semibold">Data:</span>
+                    <span>${formattedDate}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="fw-semibold">Categoria:</span>
+                    <span>${transaction.category}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="fw-semibold">Valor:</span>
+                    <span class="${transaction.type === 'income' ? 'text-success' : 'text-danger'}">
+                      R$ ${transaction.amount.toFixed(2)}
+                    </span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="fw-semibold">Conta:</span>
+                    <span>${transaction.account}</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span class="fw-semibold">Status:</span>
+                    <span>
+                      <span class="${transaction.status === 'Concluído' ? 'badge bg-label-success' : 'badge bg-label-warning'}">
+                        ${transaction.status}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+                <div class="mb-0">
+                  <div class="fw-semibold mb-1">Observações:</div>
+                  <p class="mb-0">${transaction.notes || 'Nenhuma observação registrada.'}</p>
+                </div>
+              </div>
+            `;
+          }
+        }
+      });
+    });
+    
+    // Listener para modal de edição
+    document.querySelectorAll('[data-bs-target="#editTransactionModal"]').forEach(button => {
+      button.addEventListener('click', function() {
+        const transactionId = parseInt(this.dataset.transactionId);
+        const transaction = transactions.find(t => t.id === transactionId);
+        
+        if (transaction) {
+          // Preencher o formulário com os dados da transação
+          const modal = document.getElementById('editTransactionModal');
+          if (modal) {
+            // TODO: Implementar preenchimento do formulário de edição
+            console.log('Editar transação:', transaction);
+          }
+        }
+      });
+    });
+  };
 
-  // Pegar formulário de nova transação
-  const newTransactionForm = document.getElementById('formNewTransaction');
-
-  // Adicionar evento para a submissão do formulário
-  if (newTransactionForm) {
+  // Configurar formulário de nova transação
+  const setupTransactionForm = (data) => {
+    const newTransactionForm = document.getElementById('newTransactionForm');
+    const transactionTypeRadios = document.getElementsByName('transactionType');
+    const categorySelect = document.getElementById('transactionCategory');
+    
+    if (!newTransactionForm || !categorySelect) return;
+    
+    // Adicionar event listener para alterar as categorias quando o tipo de transação mudar
+    transactionTypeRadios.forEach(radio => {
+      radio.addEventListener('change', function() {
+        updateCategoryOptions(categorySelect, data.categories, this.value);
+      });
+    });
+    
+    // Inicializar categorias com base no tipo selecionado por padrão
+    const defaultType = document.querySelector('input[name="transactionType"]:checked').value;
+    updateCategoryOptions(categorySelect, data.categories, defaultType);
+    
+    // Preencher o select de contas
+    const accountSelect = document.getElementById('transactionAccount');
+    if (accountSelect) {
+      accountSelect.innerHTML = '';
+      data.accounts.forEach(account => {
+        const option = document.createElement('option');
+        option.value = account;
+        option.textContent = account;
+        accountSelect.appendChild(option);
+      });
+    }
+    
+    // Event listener para envio do formulário
     newTransactionForm.addEventListener('submit', function(e) {
       e.preventDefault();
-
-      // Coletar dados do formulário
-      const type = document.getElementById('transactionType').value;
-      const category = document.getElementById('transactionCategory').value;
-      const amount = parseFloat(document.getElementById('transactionAmount').value);
-      const date = document.getElementById('transactionDate').value;
-      const description = document.getElementById('transactionDescription').value;
-      const notes = document.getElementById('transactionNotes').value;
-
-      // Verificar canais selecionados
-      const channels = [];
-      if (document.getElementById('youtube').checked) channels.push('YouTube');
-      if (document.getElementById('instagram').checked) channels.push('Instagram');
-      if (document.getElementById('tiktok').checked) channels.push('TikTok');
-
-      // Criar nova transação
-      const newTransaction = {
-        date: formatDate(date),
-        description: description,
-        category: document.getElementById('transactionCategory').options[document.getElementById('transactionCategory').selectedIndex].text,
-        channel: channels.join(', '),
-        amount: amount,
-        type: type,
-        status: 'Concluído',
-        notes: notes
-      };
-
-      // Adicionar à lista e atualizar a interface
-      addTransaction(newTransaction);
-
-      // Resetar formulário
-      newTransactionForm.reset();
-
-      // Fechar o formulário
-      const bsCollapse = new bootstrap.Collapse(document.getElementById('collapseExample'));
-      bsCollapse.hide();
-
-      // Mostrar alerta de sucesso
-      alert('Transação adicionada com sucesso!');
+      
+      // Simulação de envio ao backend
+      const submitBtn = this.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processando...';
+      
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Adicionar Transação';
+        
+        // Fechar modal e exibir mensagem de sucesso
+        const modal = bootstrap.Modal.getInstance(document.getElementById('newTransactionModal'));
+        modal.hide();
+        
+        // Exibir mensagem de sucesso
+        const alert = document.createElement('div');
+        alert.classList.add('alert', 'alert-success', 'alert-dismissible', 'fade', 'show');
+        alert.innerHTML = `
+          <div>Transação adicionada com sucesso!</div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        document.querySelector('.container-xxl').prepend(alert);
+        
+        // Limpar formulário
+        newTransactionForm.reset();
+        
+        // Simular recarregamento de dados
+        initTransactions();
+      }, 1500);
     });
-  }
+  };
 
-  // Configurar filtros
-  const filterForm = document.getElementById('filterTransactions');
-  if (filterForm) {
-    filterForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      // Coletar critérios de filtro
-      const filterType = document.getElementById('filterType').value;
-      const filterCategory = document.getElementById('filterCategory').value;
-      const filterDateFrom = document.getElementById('filterDateFrom').value;
-      const filterDateTo = document.getElementById('filterDateTo').value;
-
-      // Filtrar transações
-      let filteredTransactions = [...transactions];
-
-      // Filtrar por tipo
-      if (filterType) {
-        filteredTransactions = filteredTransactions.filter(t => t.type === filterType);
-      }
-
-      // Filtrar por categoria (ignorando maiúsculas/minúsculas)
-      if (filterCategory) {
-        filteredTransactions = filteredTransactions.filter(t =>
-          t.category.toLowerCase().includes(filterCategory.toLowerCase())
-        );
-      }
-
-      // Filtrar por data inicial
-      if (filterDateFrom) {
-        const fromDate = new Date(filterDateFrom);
-        filteredTransactions = filteredTransactions.filter(t => {
-          const tDate = new Date(t.date.split('/').reverse().join('-'));
-          return tDate >= fromDate;
-        });
-      }
-
-      // Filtrar por data final
-      if (filterDateTo) {
-        const toDate = new Date(filterDateTo);
-        filteredTransactions = filteredTransactions.filter(t => {
-          const tDate = new Date(t.date.split('/').reverse().join('-'));
-          return tDate <= toDate;
-        });
-      }
-
-      // Renderizar resultados filtrados
-      renderTransactions(filteredTransactions);
+  // Atualizar opções de categoria com base no tipo de transação
+  const updateCategoryOptions = (selectElement, categories, type) => {
+    if (!selectElement) return;
+    
+    // Limpar opções atuais
+    selectElement.innerHTML = '';
+    
+    // Adicionar novas opções com base no tipo
+    const categoryList = type === 'income' ? categories.income : categories.expense;
+    categoryList.forEach(category => {
+      const option = document.createElement('option');
+      option.value = category;
+      option.textContent = category;
+      selectElement.appendChild(option);
     });
+  };
 
-    // Resetar filtros
-    filterForm.addEventListener('reset', function() {
-      setTimeout(() => renderTransactions(transactions), 10);
-    });
-  }
+  // Adicionar ao escopo global para uso em onclick
+  window.confirmDeleteTransaction = function(transactionId) {
+    if (confirm(`Tem certeza que deseja excluir a transação #${transactionId}?`)) {
+      // Simulação de exclusão
+      console.log('Excluindo transação:', transactionId);
+      
+      // Exibir mensagem de sucesso
+      const alert = document.createElement('div');
+      alert.classList.add('alert', 'alert-success', 'alert-dismissible', 'fade', 'show');
+      alert.innerHTML = `
+        <div>Transação #${transactionId} excluída com sucesso!</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      
+      document.querySelector('.container-xxl').prepend(alert);
+      
+      // Recarregar dados
+      initTransactions();
+    }
+  };
 
-  // Configurar ordenação
-  const sortOptions = document.querySelectorAll('.dropdown-menu .dropdown-item[href="javascript:void(0);"]');
-  sortOptions.forEach(option => {
-    option.addEventListener('click', function() {
-      let sortedTransactions = [...transactions];
-
-      // Ordenar com base no texto do item selecionado
-      const sortText = this.textContent.trim();
-
-      if (sortText === 'Data (recente)') {
-        sortedTransactions.sort((a, b) => new Date(b.date.split('/').reverse().join('-')) - new Date(a.date.split('/').reverse().join('-')));
-      } else if (sortText === 'Data (antiga)') {
-        sortedTransactions.sort((a, b) => new Date(a.date.split('/').reverse().join('-')) - new Date(b.date.split('/').reverse().join('-')));
-      } else if (sortText === 'Valor (maior)') {
-        sortedTransactions.sort((a, b) => b.amount - a.amount);
-      } else if (sortText === 'Valor (menor)') {
-        sortedTransactions.sort((a, b) => a.amount - b.amount);
-      } else if (sortText === 'Categoria (A-Z)') {
-        sortedTransactions.sort((a, b) => a.category.localeCompare(b.category));
-      }
-
-      // Renderizar transações ordenadas
-      renderTransactions(sortedTransactions);
-    });
-  });
+  // Inicializar a página
+  initTransactions();
 });
