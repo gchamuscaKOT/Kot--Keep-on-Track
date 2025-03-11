@@ -81,3 +81,86 @@ exports.changePassword = async (req, res) => {
     return res.status(500).send({ message: error.message });
   }
 };
+const { supabaseClient } = require('../config/supabase.config');
+
+/**
+ * Obter perfil do usuário autenticado
+ */
+const getProfile = async (req, res) => {
+  try {
+    // Perfil do usuário já está disponível na requisição após autenticação
+    return res.status(200).json({ 
+      user: req.user 
+    });
+  } catch (error) {
+    console.error('Erro ao obter perfil do usuário:', error);
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
+
+/**
+ * Atualizar perfil do usuário
+ */
+const updateProfile = async (req, res) => {
+  const { full_name, avatar_url, website, bio } = req.body;
+  const userId = req.user.id;
+
+  try {
+    // Atualizar dados do usuário no Supabase
+    const { data, error } = await supabaseClient.auth.updateUser({
+      data: {
+        full_name: full_name || req.user.user_metadata?.full_name,
+        avatar_url: avatar_url || req.user.user_metadata?.avatar_url,
+        website: website || req.user.user_metadata?.website,
+        bio: bio || req.user.user_metadata?.bio
+      }
+    });
+
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    return res.status(200).json({ 
+      message: 'Perfil atualizado com sucesso',
+      user: data.user 
+    });
+  } catch (error) {
+    console.error('Erro ao atualizar perfil do usuário:', error);
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
+
+/**
+ * Alterar senha do usuário
+ */
+const changePassword = async (req, res) => {
+  const { password } = req.body;
+
+  if (!password) {
+    return res.status(400).json({ message: 'Nova senha é obrigatória' });
+  }
+
+  try {
+    // Atualizar senha no Supabase
+    const { error } = await supabaseClient.auth.updateUser({
+      password: password
+    });
+
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    return res.status(200).json({ 
+      message: 'Senha alterada com sucesso' 
+    });
+  } catch (error) {
+    console.error('Erro ao alterar senha:', error);
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
+
+module.exports = {
+  getProfile,
+  updateProfile,
+  changePassword
+};

@@ -134,3 +134,108 @@ module.exports = {
   validateChannel,
   validateTask
 };
+/**
+ * Middleware para validar dados de transações financeiras
+ */
+const validateTransaction = (req, res, next) => {
+  const { date, description, amount, type, category_id } = req.body;
+
+  // Validar campos obrigatórios
+  if (!date || !amount || !type) {
+    return res.status(400).json({ 
+      message: 'Campos obrigatórios: data, valor e tipo da transação.' 
+    });
+  }
+
+  // Validar tipo de transação
+  if (type !== 'income' && type !== 'expense') {
+    return res.status(400).json({ 
+      message: 'Tipo de transação deve ser "income" ou "expense".' 
+    });
+  }
+
+  // Validar valor
+  if (isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+    return res.status(400).json({ 
+      message: 'O valor deve ser um número positivo.' 
+    });
+  }
+
+  next();
+};
+
+/**
+ * Middleware para validar dados de categorias
+ */
+const validateCategory = (req, res, next) => {
+  const { name, type, color, icon } = req.body;
+
+  // Validar campos obrigatórios
+  if (!name || !type || !color || !icon) {
+    return res.status(400).json({ 
+      message: 'Campos obrigatórios: nome, tipo, cor e ícone.' 
+    });
+  }
+
+  // Validar tipo de categoria
+  if (type !== 'income' && type !== 'expense') {
+    return res.status(400).json({ 
+      message: 'Tipo de categoria deve ser "income" ou "expense".' 
+    });
+  }
+
+  next();
+};
+
+/**
+ * Middleware para validar dados de métodos de pagamento
+ */
+const validatePaymentMethod = (req, res, next) => {
+  const { name, icon } = req.body;
+
+  // Validar campos obrigatórios
+  if (!name || !icon) {
+    return res.status(400).json({ 
+      message: 'Campos obrigatórios: nome e ícone.' 
+    });
+  }
+
+  next();
+};
+
+/**
+ * Middleware para validar dados de ativos
+ */
+const validateAsset = (req, res, next) => {
+  const { name, type, value, acquisition_date } = req.body;
+
+  // Validar campos obrigatórios
+  if (!name || !type || !value || !acquisition_date) {
+    return res.status(400).json({ 
+      message: 'Campos obrigatórios: nome, tipo, valor e data de aquisição.' 
+    });
+  }
+
+  // Validar tipo de ativo
+  if (type !== 'investment' && type !== 'property') {
+    return res.status(400).json({ 
+      message: 'Tipo de ativo deve ser "investment" ou "property".' 
+    });
+  }
+
+  // Validar valor
+  if (isNaN(parseFloat(value)) || parseFloat(value) <= 0) {
+    return res.status(400).json({ 
+      message: 'O valor deve ser um número positivo.' 
+    });
+  }
+
+  next();
+};
+
+module.exports = {
+  validateTransaction,
+  validateCategory,
+  validatePaymentMethod,
+  validateAsset
+};

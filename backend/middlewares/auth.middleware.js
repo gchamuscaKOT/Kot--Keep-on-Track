@@ -115,3 +115,39 @@ const authMiddleware = {
 };
 
 module.exports = authMiddleware;
+const { supabaseClient } = require('../config/supabase.config');
+
+/**
+ * Middleware para verificar se o usuário está autenticado
+ */
+const authenticate = async (req, res, next) => {
+  // Obter token de autorização do cabeçalho
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Acesso não autorizado. Token não fornecido.' });
+  }
+
+  // Extrair o token
+  const token = authHeader.split(' ')[1];
+
+  try {
+    // Verificar o token com o Supabase
+    const { data, error } = await supabaseClient.auth.getUser(token);
+
+    if (error || !data.user) {
+      return res.status(401).json({ message: 'Acesso não autorizado. Token inválido.' });
+    }
+
+    // Adicionar informações do usuário ao objeto de requisição
+    req.user = data.user;
+    next();
+  } catch (error) {
+    console.error('Erro ao verificar autenticação:', error);
+    return res.status(500).json({ message: 'Erro interno do servidor.' });
+  }
+};
+
+module.exports = {
+  authenticate
+};

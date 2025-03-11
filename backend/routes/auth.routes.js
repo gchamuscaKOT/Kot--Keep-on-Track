@@ -20,3 +20,20 @@ router.post("/signup", validateSignUp, authController.signup);
 router.post("/signin", validateSignIn, authController.signin);
 
 module.exports = router;
+const express = require('express');
+const router = express.Router();
+const authController = require('../controllers/auth.controller');
+
+// Rota para registro de usuário
+router.post('/register', authController.register);
+
+// Rota para login
+router.post('/login', authController.login);
+
+// Rota para logout
+router.post('/logout', authController.logout);
+
+// Rota para resetar senha
+router.post('/reset-password', authController.resetPassword);
+
+module.exports = router;

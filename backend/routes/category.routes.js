@@ -26,3 +26,31 @@ router.put("/:id", verifyToken, isAdmin, validateCategory, categoryController.up
 router.delete("/:id", verifyToken, isAdmin, categoryController.delete);
 
 module.exports = router;
+const express = require('express');
+const router = express.Router();
+const categoryController = require('../controllers/category.controller');
+const { authenticate } = require('../middlewares/auth.middleware');
+const { validateCategory } = require('../middlewares/validation.middleware');
+
+// Todas as rotas exigem autenticação
+router.use(authenticate);
+
+// Rota para obter todas as categorias
+router.get('/', categoryController.getAllCategories);
+
+// Rota para obter categorias por tipo
+router.get('/type/:type', categoryController.getCategoriesByType);
+
+// Rota para obter uma categoria específica
+router.get('/:id', categoryController.getCategoryById);
+
+// Rota para criar uma nova categoria
+router.post('/', validateCategory, categoryController.createCategory);
+
+// Rota para atualizar uma categoria
+router.put('/:id', validateCategory, categoryController.updateCategory);
+
+// Rota para excluir uma categoria
+router.delete('/:id', categoryController.deleteCategory);
+
+module.exports = router;

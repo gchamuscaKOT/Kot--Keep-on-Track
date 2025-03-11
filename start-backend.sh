@@ -1,2 +1,3 @@
-# Configuração para iniciar o backend KOT
+
+#!/bin/bash
 cd backend && node server.js

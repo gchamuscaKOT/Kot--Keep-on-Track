@@ -215,3 +215,131 @@ exports.signin = async (req, res) => {
     return res.status(500).send({ message: error.message });
   }
 };
+const { supabaseClient } = require('../config/supabase.config');
+
+/**
+ * Registrar um novo usuário
+ */
+const register = async (req, res) => {
+  const { email, password, name } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email e senha são obrigatórios' });
+  }
+
+  try {
+    // Registrar usuário no Supabase
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name || '',
+        }
+      }
+    });
+
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    return res.status(201).json({ 
+      message: 'Usuário registrado com sucesso',
+      user: data.user 
+    });
+  } catch (error) {
+    console.error('Erro ao registrar usuário:', error);
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
+
+/**
+ * Login de usuário
+ */
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email e senha são obrigatórios' });
+  }
+
+  try {
+    // Autenticar usuário no Supabase
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return res.status(401).json({ message: error.message });
+    }
+
+    return res.status(200).json({ 
+      message: 'Login realizado com sucesso',
+      session: data.session,
+      user: data.user
+    });
+  } catch (error) {
+    console.error('Erro ao autenticar usuário:', error);
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
+
+/**
+ * Logout de usuário
+ */
+const logout = async (req, res) => {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Token não fornecido' });
+  }
+
+  try {
+    // Encerrar sessão no Supabase
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    return res.status(200).json({ message: 'Logout realizado com sucesso' });
+  } catch (error) {
+    console.error('Erro ao encerrar sessão:', error);
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
+
+/**
+ * Resetar senha de usuário
+ */
+const resetPassword = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: 'Email é obrigatório' });
+  }
+
+  try {
+    // Enviar email de recuperação de senha
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    return res.status(200).json({ 
+      message: 'Email de recuperação de senha enviado com sucesso' 
+    });
+  } catch (error) {
+    console.error('Erro ao solicitar recuperação de senha:', error);
+    return res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  logout,
+  resetPassword
+};
