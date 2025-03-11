@@ -12,7 +12,7 @@
     headingColor = config.colors_dark.headingColor;
     labelColor = config.colors_dark.textMuted;
     legendColor = config.colors_dark.bodyColor;
-    borderColor = config.colors_dark.borderColor;
+    borderColor = config.colors.borderColor;
   } else {
     cardColor = config.colors.cardColor;
     headingColor = config.colors.headingColor;
@@ -91,12 +91,18 @@
         }
       },
       yaxis: {
+        axisBorder: {
+          show: false
+        },
+        axisTicks: {
+          show: false
+        },
         labels: {
           style: {
             colors: labelColor
           },
-          formatter: function(val) {
-            return 'R$ ' + val.toLocaleString('pt-BR', {maximumFractionDigits: 0});
+          formatter: function (value) {
+            return 'R$ ' + value.toLocaleString('pt-BR');
           }
         }
       },
@@ -104,18 +110,13 @@
         shared: true,
         intersect: false,
         y: {
-          formatter: function(y) {
-            if (typeof y !== 'undefined') {
-              return 'R$ ' + y.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-            }
-            return y;
+          formatter: function (value) {
+            return 'R$ ' + value.toLocaleString('pt-BR');
           }
         }
       },
       legend: {
-        labels: {
-          colors: legendColor
-        },
+        show: true,
         position: 'top',
         horizontalAlign: 'right'
       }
@@ -309,10 +310,6 @@
     });
   });
 
-
-  /**
-   * Financial Dashboard - Javascript
-   */
 
   // Configuração Global
   const primaryColor = config.colors.primary;
@@ -1015,7 +1012,7 @@
         { month: 'Dez', income: 12628, expense: 4679, balance: 7949 }
       ],
       categories: [
-        { name: 'AdSense', type: ''income', total: 5628 },
+        { name: 'AdSense', type: 'income', total: 5628 },
         { name: 'Patrocínio', type: 'income', total: 4200 },
         { name: 'Afiliados', type: 'income', total: 1800 },
         { name: 'Vendas', type: 'income', total: 1000 },
