@@ -6,6 +6,8 @@
 
 (function () {
   let cardColor, headingColor, labelColor, borderColor, legendColor;
+  // Definir isDarkStyle com base na preferência do sistema ou um valor padrão (false para modo claro)
+  const isDarkStyle = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches || false;
 
   if (isDarkStyle) {
     cardColor = config.colors_dark.cardColor;
@@ -25,6 +27,16 @@
   // --------------------------------------------------------------------
   const financialChartEl = document.querySelector('#financialChart');
   if (financialChartEl) {
+    // Meses do ano para o eixo x
+    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    
+    // Dados mensais
+    const incomeData = [4200, 3800, 5100, 4800, 7200, 8500, 9200, 8700, 10500, 11500, 12000, 12628];
+    const expenseData = [2000, 1800, 2300, 2800, 3100, 3500, 3800, 3500, 4100, 4500, 4600, 4679];
+    
+    // Calcular lucro (receitas - despesas)
+    const profitData = incomeData.map((income, index) => income - expenseData[index]);
+    
     const financialChartConfig = {
       chart: {
         height: 400,
@@ -39,24 +51,24 @@
         {
           name: 'Receitas',
           type: 'column',
-          data: [4200, 3800, 5100, 4800, 7200, 8500, 9200, 8700, 10500, 11500, 12000, 12628]
+          data: incomeData
         },
         {
           name: 'Despesas',
           type: 'column',
-          data: [2000, 1800, 2300, 2800, 3100, 3500, 3800, 3500, 4100, 4500, 4600, 4679]
+          data: expenseData
         },
         {
           name: 'Lucro',
           type: 'line',
-          data: [2200, 2000, 2800, 2000, 4100, 5000, 5400, 5200, 6400, 7000, 7400, 7949]
+          data: profitData
         }
       ],
       stroke: {
         width: [0, 0, 3],
         curve: 'smooth'
       },
-      colors: [config.colors.success, config.colors.danger, config.colors.primary],
+      colors: ['#a5d6a7', '#ffccbc', '#90caf9'], // Cores mais suaves
       grid: {
         borderColor: borderColor,
         padding: {
@@ -77,6 +89,47 @@
         }
       },
       xaxis: {
+        categories: months,
+        axisBorder: {
+          show: false
+        },
+        axisTicks: {
+          show: false
+        },
+        labels: {
+          style: {
+            colors: labelColor
+          }
+        }
+      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: labelColor
+          },
+          formatter: function (val) {
+            return 'R$ ' + val.toFixed(0);
+          }
+        }
+      },
+      tooltip: {
+        shared: true,
+        intersect: false,
+        y: {
+          formatter: function (y) {
+            if (typeof y !== "undefined") {
+              return "R$ " + y.toFixed(2);
+            }
+            return y;
+          }
+        }
+      },
+      legend: {
+        labels: {
+          colors: legendColor
+        },
+        offsetY: 5
+      } {
         categories: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
         axisBorder: {
           show: false
@@ -707,6 +760,132 @@
 
       const expenseCategoryChart = new ApexCharts(expenseCategoryChartEl, expenseCategoryChartConfig);
       expenseCategoryChart.render();
+    }
+    
+    // Gráfico de Fluxo de Caixa Diário
+    const dailyCashFlowEl = document.querySelector('#dailyCashFlowChart');
+    if (dailyCashFlowEl) {
+      // Dados para um mês (30 dias)
+      const days = Array.from({length: 30}, (_, i) => `${(i + 1).toString().padStart(2, '0')}/06`);
+      
+      // Valores diários simulados
+      const incomeDaily = [0, 350, 0, 0, 1200, 0, 0, 850, 0, 0, 0, 0, 500, 0, 0, 700, 0, 0, 0, 0, 1500, 0, 0, 0, 950, 0, 0, 0, 0, 2500];
+      const expenseDaily = [150, 0, 75, 0, 0, 200, 0, 0, 130, 0, 50, 0, 0, 350, 0, 0, 200, 0, 75, 0, 0, 450, 0, 0, 0, 120, 0, 400, 0, 0];
+      
+      // Calcular saldo acumulado
+      let balance = 0;
+      const balanceDaily = incomeDaily.map((income, index) => {
+        balance += income - expenseDaily[index];
+        return balance;
+      });
+      
+      const dailyCashFlowConfig = {
+        chart: {
+          height: 300,
+          type: 'line',
+          stacked: false,
+          toolbar: {
+            show: true
+          },
+          zoom: {
+            enabled: true
+          }
+        },
+        stroke: {
+          width: [0, 0, 3],
+          curve: 'smooth'
+        },
+        plotOptions: {
+          bar: {
+            columnWidth: '50%'
+          }
+        },
+        colors: ['#a5d6a7', '#ffccbc', '#90caf9'],
+        series: [
+          {
+            name: 'Receitas',
+            type: 'column',
+            data: incomeDaily
+          },
+          {
+            name: 'Despesas',
+            type: 'column',
+            data: expenseDaily
+          },
+          {
+            name: 'Saldo',
+            type: 'line',
+            data: balanceDaily
+          }
+        ],
+        fill: {
+          opacity: [0.85, 0.85, 1],
+          gradient: {
+            inverseColors: false,
+            shade: 'light',
+            type: "vertical",
+            opacityFrom: 0.85,
+            opacityTo: 0.55,
+            stops: [0, 100, 100, 100]
+          }
+        },
+        markers: {
+          size: 0
+        },
+        xaxis: {
+          categories: days,
+          labels: {
+            style: {
+              colors: labelColor
+            }
+          },
+          axisBorder: {
+            show: false
+          },
+          axisTicks: {
+            show: false
+          }
+        },
+        yaxis: {
+          labels: {
+            style: {
+              colors: labelColor
+            },
+            formatter: function (val) {
+              return 'R$ ' + val.toFixed(0);
+            }
+          }
+        },
+        tooltip: {
+          shared: true,
+          intersect: false,
+          y: {
+            formatter: function (y) {
+              if (typeof y !== "undefined") {
+                return "R$ " + y.toFixed(2);
+              }
+              return y;
+            }
+          }
+        },
+        legend: {
+          labels: {
+            colors: legendColor
+          },
+          offsetY: 5
+        },
+        grid: {
+          borderColor: borderColor,
+          padding: {
+            left: 10,
+            right: 0
+          }
+        }
+      };
+      
+      const dailyCashFlowChart = new ApexCharts(dailyCashFlowEl, dailyCashFlowConfig);
+      dailyCashFlowChart.render();
+    }egoryChart.render();
     }
   }
 

@@ -174,10 +174,10 @@
       labels: ['AdSense', 'Patrocínio', 'Programa de Afiliados', 'Venda Direta'],
       series: [33.3, 38.7, 21.9, 6.1],
       colors: [
-        config.colors.success,
-        config.colors.primary,
-        config.colors.info,
-        config.colors.secondary
+        '#a5d6a7', // Verde pastel
+        '#bbdefb', // Azul pastel
+        '#d1c4e9', // Roxo pastel
+        '#ffecb3'  // Amarelo pastel
       ],
       stroke: {
         width: 0
