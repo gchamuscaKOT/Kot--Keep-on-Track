@@ -1063,30 +1063,312 @@
         const date = new Date(transaction.date).toLocaleDateString('pt-BR');
         const status = '<span class="badge bg-label-success me-1">Concluído</span>';
         const amount = `R$ ${parseFloat(transaction.amount).toFixed(2).replace('.', ',')}`;
-        const amountClass = transaction.type === 'income' ? 'text-success' : 'text-danger';
+        const a/**
+ * Financial Dashboard
+ */
 
-        // Construir a linha
-        row.innerHTML = `
-          <td>${icon} #${transaction.id.substring(0, 4)}</td>
-          <td>${date}</td>
-          <td>${transaction.description}</td>
-          <td>${transaction.category ? transaction.category.name : type}</td>
-          <td><strong class="${amountClass}">${amount}</strong></td>
-          <td>${status}</td>
-          <td>
-            <div class="dropdown">
-              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                <i class="bx bx-dots-vertical-rounded"></i>
-              </button>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="financial-transactions.html?edit=${transaction.id}">
-                  <i class="bx bx-edit-alt me-1"></i> Editar
-                </a>
-                <a class="dropdown-item" href="javascript:deleteTransaction('${transaction.id}');">
-                  <i class="bx bx-trash me-1"></i> Excluir
-                </a>
-              </div>
+document.addEventListener('DOMContentLoaded', function() {
+  'use strict';
+
+  // Dados demo para os gráficos
+  const demoData = {
+    // Dados financeiros
+    financialChart: {
+      income: [5800, 6300, 6800, 6200, 7500, 8200],
+      expense: [3200, 3400, 2800, 3100, 2900, 2800],
+      months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho']
+    },
+    // Dados para gráfico de categoria
+    categoryData: [
+      { name: 'AdSense', value: 45 },
+      { name: 'Patrocínios', value: 30 },
+      { name: 'Afiliados', value: 15 },
+      { name: 'Vendas Diretas', value: 10 }
+    ],
+    // Dados para gráfico de despesas
+    expenseCategoryData: [
+      { name: 'Equipamento', value: 35 },
+      { name: 'Software', value: 25 },
+      { name: 'Serviços', value: 20 },
+      { name: 'Impostos', value: 20 }
+    ],
+    // Transações recentes
+    recentTransactions: [
+      {
+        id: '1258',
+        date: '12/06/2023',
+        description: 'Pagamento de patrocínio',
+        category: 'Patrocínio',
+        amount: 1200.00,
+        type: 'income',
+        status: 'Concluído'
+      },
+      {
+        id: '1257',
+        date: '10/06/2023',
+        description: 'Equipamento de gravação',
+        category: 'Equipamento',
+        amount: 750.00,
+        type: 'expense',
+        status: 'Concluído'
+      },
+      {
+        id: '1256',
+        date: '08/06/2023',
+        description: 'Monetização YouTube',
+        category: 'AdSense',
+        amount: 850.75,
+        type: 'income',
+        status: 'Concluído'
+      },
+      {
+        id: '1255',
+        date: '05/06/2023',
+        description: 'Software de edição',
+        category: 'Software',
+        amount: 129.99,
+        type: 'expense',
+        status: 'Concluído'
+      },
+      {
+        id: '1254',
+        date: '01/06/2023',
+        description: 'Patrocínio Instagram',
+        category: 'Patrocínio',
+        amount: 500.00,
+        type: 'income',
+        status: 'Concluído'
+      }
+    ]
+  };
+
+  // Configurações dos gráficos
+  const config = {
+    colors: {
+      primary: '#696cff',
+      secondary: '#8592a3',
+      success: '#71dd37',
+      info: '#03c3ec',
+      warning: '#ffab00',
+      danger: '#ff3e1d',
+      dark: '#233446',
+      black: '#000',
+      white: '#fff',
+      cardColor: '#fff',
+      bodyBg: '#f5f5f9',
+      bodyColor: '#697a8d',
+      headingColor: '#566a7f',
+      textMuted: '#a1acb8',
+      borderColor: '#eceef1'
+    }
+  };
+
+  // Inicialização
+  const init = function() {
+    renderFinancialChart();
+    renderCategoryCharts();
+    renderRecentTransactions();
+  };
+
+  // Renderizar gráfico financeiro
+  const renderFinancialChart = function() {
+    const financialChartEl = document.querySelector('#financialChart');
+    if (financialChartEl) {
+      const chartOptions = {
+        chart: {
+          height: 400,
+          type: 'line',
+          stacked: false,
+          parentHeightOffset: 0,
+          toolbar: {
+            show: true
+          }
+        },
+        series: [
+          {
+            name: 'Receitas',
+            type: 'column',
+            data: demoData.financialChart.income
+          },
+          {
+            name: 'Despesas',
+            type: 'column',
+            data: demoData.financialChart.expense
+          },
+          {
+            name: 'Saldo',
+            type: 'line',
+            data: demoData.financialChart.income.map((val, idx) => val - demoData.financialChart.expense[idx])
+          }
+        ],
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '55%',
+            borderRadius: 4
+          }
+        },
+        colors: [config.colors.success, config.colors.danger, config.colors.primary],
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          width: [0, 0, 3],
+          curve: 'smooth'
+        },
+        legend: {
+          offsetY: 7
+        },
+        xaxis: {
+          categories: demoData.financialChart.months
+        },
+        yaxis: [
+          {
+            title: {
+              text: 'Valor (R$)'
+            }
+          }
+        ],
+        tooltip: {
+          shared: true,
+          intersect: false,
+          y: {
+            formatter: function(y) {
+              if (typeof y !== "undefined") {
+                return "R$ " + y.toFixed(2);
+              }
+              return y;
+            }
+          }
+        }
+      };
+      
+      const financialChart = new ApexCharts(financialChartEl, chartOptions);
+      financialChart.render();
+    }
+  };
+
+  // Renderizar gráficos de categoria
+  const renderCategoryCharts = function() {
+    // Gráfico de receitas por categoria
+    const categoryChartEl = document.querySelector('#categoryChart');
+    if (categoryChartEl) {
+      const categoryChartOptions = {
+        chart: {
+          height: 300,
+          type: 'pie'
+        },
+        labels: demoData.categoryData.map(item => item.name),
+        series: demoData.categoryData.map(item => item.value),
+        colors: [
+          config.colors.primary,
+          config.colors.success,
+          config.colors.info,
+          config.colors.warning
+        ],
+        legend: {
+          position: 'bottom'
+        },
+        tooltip: {
+          y: {
+            formatter: function(val) {
+              return val + '%';
+            }
+          }
+        }
+      };
+      
+      const categoryChart = new ApexCharts(categoryChartEl, categoryChartOptions);
+      categoryChart.render();
+    }
+    
+    // Gráfico de despesas por categoria
+    const expenseCategoryChartEl = document.querySelector('#expenseCategoryChart');
+    if (expenseCategoryChartEl) {
+      const expenseCategoryChartOptions = {
+        chart: {
+          height: 300,
+          type: 'pie'
+        },
+        labels: demoData.expenseCategoryData.map(item => item.name),
+        series: demoData.expenseCategoryData.map(item => item.value),
+        colors: [
+          config.colors.danger,
+          config.colors.warning,
+          config.colors.info,
+          config.colors.secondary
+        ],
+        legend: {
+          position: 'bottom'
+        },
+        tooltip: {
+          y: {
+            formatter: function(val) {
+              return val + '%';
+            }
+          }
+        }
+      };
+      
+      const expenseCategoryChart = new ApexCharts(expenseCategoryChartEl, expenseCategoryChartOptions);
+      expenseCategoryChart.render();
+    }
+  };
+
+  // Renderizar transações recentes
+  const renderRecentTransactions = function() {
+    const tableBody = document.querySelector('.table tbody');
+    if (!tableBody) return;
+    
+    // Limpar tabela existente
+    tableBody.innerHTML = '';
+    
+    // Renderizar transações
+    demoData.recentTransactions.forEach(transaction => {
+      const row = document.createElement('tr');
+      
+      // Determinar ícones e classes
+      const icon = transaction.type === 'income' 
+                  ? '<i class="bx bx-trending-up text-success me-1"></i>' 
+                  : '<i class="bx bx-trending-down text-danger me-1"></i>';
+      
+      const amountClass = transaction.type === 'income' ? 'text-success' : 'text-danger';
+      
+      // Formatar o valor
+      const amount = `R$ ${transaction.amount.toFixed(2).replace('.', ',')}`;
+      
+      // Construir a linha
+      row.innerHTML = `
+        <td>${icon} #${transaction.id}</td>
+        <td>${transaction.date}</td>
+        <td>${transaction.description}</td>
+        <td>${transaction.category}</td>
+        <td><strong class="${amountClass}">${amount}</strong></td>
+        <td><span class="badge bg-label-success me-1">${transaction.status}</span></td>
+        <td>
+          <div class="dropdown">
+            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+              <i class="bx bx-dots-vertical-rounded"></i>
+            </button>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="financial-transactions.html?edit=${transaction.id}">
+                <i class="bx bx-edit-alt me-1"></i> Editar
+              </a>
+              <a class="dropdown-item" href="javascript:void(0);">
+                <i class="bx bx-trash me-1"></i> Excluir
+              </a>
             </div>
+          </div>
+        </td>
+      `;
+      
+      tableBody.appendChild(row);
+    });
+  };
+
+  // Inicializar
+  init();
+});>
           </td>
         `;
 

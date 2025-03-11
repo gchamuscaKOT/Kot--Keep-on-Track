@@ -610,33 +610,6 @@
     <script src="../assets/js/main.js"></script>
 
     <!-- Page JS -->
-    <script>
-      // Script básico para simular o funcionamento do formulário
-      document.addEventListener('DOMContentLoaded', function() {
-        // Formulário de Nova Transação
-        const formNewTransaction = document.getElementById('formNewTransaction');
-        if (formNewTransaction) {
-          formNewTransaction.addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Transação salva com sucesso! (Simulação)');
-            this.reset();
-            // Fechar o formulário após salvar
-            const bsCollapse = new bootstrap.Collapse(document.getElementById('collapseExample'), {
-              toggle: false
-            });
-            bsCollapse.hide();
-          });
-        }
-
-        // Formulário de Filtros
-        const filterTransactions = document.getElementById('filterTransactions');
-        if (filterTransactions) {
-          filterTransactions.addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Filtros aplicados! (Simulação)');
-          });
-        }
-      });
-    </script>
+    <script src="../assets/js/financial-transactions.js"></script>
   </body>
 </html>
