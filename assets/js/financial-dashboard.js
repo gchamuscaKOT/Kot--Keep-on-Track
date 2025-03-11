@@ -92,6 +92,48 @@
         }
       },
       yaxis: {
+        labels: {
+          style: {
+            colors: labelColor
+          },
+          formatter: function(val) {
+            return 'R$ ' + val.toLocaleString('pt-BR', {maximumFractionDigits: 0});
+          }
+        }
+      },
+      tooltip: {
+        shared: true,
+        intersect: false,
+        y: {
+          formatter: function(y) {
+            if (typeof y !== 'undefined') {
+              return 'R$ ' + y.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            }
+            return y;
+          }
+        }
+      },
+      legend: {
+        labels: {
+          colors: legendColor
+        },
+        position: 'top',
+        horizontalAlign: 'right'
+      } {
+        categories: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+        axisBorder: {
+          show: false
+        },
+        axisTicks: {
+          show: false
+        },
+        labels: {
+          style: {
+            colors: labelColor
+          }
+        }
+      },
+      yaxis: {
         title: {
           text: 'Valores (R$)',
           style: {

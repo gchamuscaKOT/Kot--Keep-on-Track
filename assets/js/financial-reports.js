@@ -87,6 +87,31 @@
       },
       yaxis: {
         title: {
+          text: 'R$'
+        },
+        labels: {
+          formatter: function(val) {
+            return 'R$ ' + val.toLocaleString('pt-BR');
+          },
+          style: {
+            colors: labelColor
+          }
+        }
+      },
+      tooltip: {
+        y: {
+          formatter: function(val) {
+            return 'R$ ' + val.toLocaleString('pt-BR');
+          }
+        }
+      },
+      legend: {
+        show: true,
+        position: 'top',
+        horizontalAlign: 'left',
+        offsetX: 40
+      }s: {
+        title: {
           text: 'Valores (R$)',
           style: {
             fontSize: '13px',
